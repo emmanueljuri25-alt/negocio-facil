@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="pt-BR">
+<html lang="es-AR">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>{% block title %}Gestão da Loja{% endblock %}</title>
+  <title>{% block title %}Gestión Comercial{% endblock %}</title>
   <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 </head>
@@ -12,16 +12,16 @@
     <div class="navbar-brand">
       <a href="{{ url_for('dashboard') }}">
         <i class="fa-solid fa-store"></i>
-        <span>Minha Loja</span>
+        <span>Mi Negocio</span>
       </a>
     </div>
-    <button class="nav-toggle" id="navToggle" aria-label="Menu">
+    <button class="nav-toggle" id="navToggle" aria-label="Menú">
       <i class="fa-solid fa-bars"></i>
     </button>
     <ul class="nav-links" id="navLinks">
       <li>
         <a href="{{ url_for('dashboard') }}" class="{% if request.endpoint == 'dashboard' %}active{% endif %}">
-          <i class="fa-solid fa-gauge"></i> Painel
+          <i class="fa-solid fa-gauge"></i> Panel
         </a>
       </li>
       <li>
@@ -31,17 +31,17 @@
       </li>
       <li>
         <a href="{{ url_for('debts') }}" class="{% if 'debt' in request.endpoint %}active{% endif %}">
-          <i class="fa-solid fa-file-invoice-dollar"></i> Dívidas
+          <i class="fa-solid fa-file-invoice-dollar"></i> Deudas
         </a>
       </li>
       <li>
         <a href="{{ url_for('inventory') }}" class="{% if 'product' in request.endpoint or request.endpoint == 'inventory' %}active{% endif %}">
-          <i class="fa-solid fa-boxes-stacked"></i> Estoque
+          <i class="fa-solid fa-boxes-stacked"></i> Inventario
         </a>
       </li>
       <li>
         <a href="{{ url_for('sales') }}" class="{% if 'sale' in request.endpoint %}active{% endif %}">
-          <i class="fa-solid fa-cash-register"></i> Vendas
+          <i class="fa-solid fa-cash-register"></i> Ventas
         </a>
       </li>
     </ul>

@@ -1,42 +1,42 @@
 {% extends "base.html" %}
-{% block title %}{% if customer %}Editar{% else %}Novo{% endif %} Cliente{% endblock %}
+{% block title %}{% if customer %}Editar{% else %}Nuevo{% endif %} Cliente{% endblock %}
 {% block content %}
 <div class="page-header">
   <h1>
     <a href="{{ url_for('customers') }}" class="back-link"><i class="fa-solid fa-arrow-left"></i></a>
-    {% if customer %}Editar Cliente{% else %}Novo Cliente{% endif %}
+    {% if customer %}Editar Cliente{% else %}Nuevo Cliente{% endif %}
   </h1>
 </div>
 
 <div class="form-card">
   <form method="post">
     <div class="form-group">
-      <label class="form-label">Nome <span class="required">*</span></label>
-      <input type="text" name="name" class="input" value="{{ customer.name if customer else '' }}" required autofocus placeholder="Nome completo">
+      <label class="form-label">Nombre <span class="required">*</span></label>
+      <input type="text" name="name" class="input" value="{{ customer.name if customer else '' }}" required autofocus placeholder="Nombre completo">
     </div>
     <div class="form-row">
       <div class="form-group">
-        <label class="form-label">Telefone / WhatsApp</label>
-        <input type="tel" name="phone" class="input" value="{{ customer.phone if customer else '' }}" placeholder="(11) 99999-9999">
+        <label class="form-label">Teléfono / WhatsApp</label>
+        <input type="tel" name="phone" class="input" value="{{ customer.phone if customer else '' }}" placeholder="(11) 1234-5678">
       </div>
       <div class="form-group">
         <label class="form-label">E-mail</label>
-        <input type="email" name="email" class="input" value="{{ customer.email if customer else '' }}" placeholder="email@exemplo.com">
+        <input type="email" name="email" class="input" value="{{ customer.email if customer else '' }}" placeholder="correo@ejemplo.com">
       </div>
     </div>
     <div class="form-group">
-      <label class="form-label">Endereço</label>
-      <input type="text" name="address" class="input" value="{{ customer.address if customer else '' }}" placeholder="Rua, número, bairro">
+      <label class="form-label">Dirección</label>
+      <input type="text" name="address" class="input" value="{{ customer.address if customer else '' }}" placeholder="Calle, número, barrio">
     </div>
     <div class="form-group">
-      <label class="form-label">Observações</label>
-      <textarea name="notes" class="input textarea" placeholder="Notas internas sobre o cliente...">{{ customer.notes if customer else '' }}</textarea>
+      <label class="form-label">Observaciones</label>
+      <textarea name="notes" class="input textarea" placeholder="Notas internas sobre el cliente...">{{ customer.notes if customer else '' }}</textarea>
     </div>
     <div class="form-actions">
       <a href="{{ url_for('customers') }}" class="btn btn-outline">Cancelar</a>
       <button type="submit" class="btn btn-primary">
         <i class="fa-solid fa-save"></i>
-        {% if customer %}Salvar alterações{% else %}Cadastrar cliente{% endif %}
+        {% if customer %}Guardar cambios{% else %}Registrar cliente{% endif %}
       </button>
     </div>
   </form>

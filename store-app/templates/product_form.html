@@ -1,63 +1,63 @@
 {% extends "base.html" %}
-{% block title %}{% if product %}Editar{% else %}Novo{% endif %} Produto{% endblock %}
+{% block title %}{% if product %}Editar{% else %}Nuevo{% endif %} Producto{% endblock %}
 {% block content %}
 <div class="page-header">
   <h1>
     <a href="{{ url_for('inventory') }}" class="back-link"><i class="fa-solid fa-arrow-left"></i></a>
-    {% if product %}Editar Produto{% else %}Novo Produto{% endif %}
+    {% if product %}Editar Producto{% else %}Nuevo Producto{% endif %}
   </h1>
 </div>
 
 <div class="form-card">
   <form method="post">
     <div class="form-group">
-      <label class="form-label">Nome do produto <span class="required">*</span></label>
-      <input type="text" name="name" class="input" value="{{ product.name if product else '' }}" required autofocus placeholder="Ex: Arroz 5kg">
+      <label class="form-label">Nombre del producto <span class="required">*</span></label>
+      <input type="text" name="name" class="input" value="{{ product.name if product else '' }}" required autofocus placeholder="Ej: Arroz 1kg">
     </div>
 
     <div class="form-group">
       <label class="form-label">Código de barras</label>
       <div class="input-group">
-        <input type="text" name="barcode_value" id="barcodeVal" class="input" value="{{ product.barcode_value if product else '' }}" placeholder="Ex: 7891234567890">
+        <input type="text" name="barcode_value" id="barcodeVal" class="input" value="{{ product.barcode_value if product else '' }}" placeholder="Ej: 7791234567890">
         <button type="button" class="btn btn-outline btn-sm" onclick="toggleBarcodeScanner()">
           <i class="fa-solid fa-barcode"></i>
         </button>
       </div>
       <div id="scannerAreaForm" style="display:none" class="scanner-area mt-2">
-        <input type="text" id="barcodeInputForm" class="input" placeholder="Escaneie o código...">
+        <input type="text" id="barcodeInputForm" class="input" placeholder="Escanee el código...">
         <button type="button" class="btn btn-sm btn-primary" onclick="captureBarcodeForm()">Capturar</button>
       </div>
     </div>
 
     <div class="form-row">
       <div class="form-group">
-        <label class="form-label">Preço de venda (R$)</label>
-        <input type="number" name="price" class="input" step="0.01" min="0" value="{{ product.price if product else '' }}" placeholder="0,00">
+        <label class="form-label">Precio de venta ($)</label>
+        <input type="number" name="price" class="input" step="0.01" min="0" value="{{ product.price if product else '' }}" placeholder="0.00">
       </div>
       <div class="form-group">
-        <label class="form-label">Custo (R$)</label>
-        <input type="number" name="cost" class="input" step="0.01" min="0" value="{{ product.cost if product else '' }}" placeholder="0,00">
+        <label class="form-label">Costo ($)</label>
+        <input type="number" name="cost" class="input" step="0.01" min="0" value="{{ product.cost if product else '' }}" placeholder="0.00">
       </div>
     </div>
 
     <div class="form-row">
       <div class="form-group">
-        <label class="form-label">Estoque atual</label>
+        <label class="form-label">Stock actual</label>
         <input type="number" name="stock" class="input" min="0" value="{{ product.stock if product else 0 }}">
       </div>
       <div class="form-group">
-        <label class="form-label">Estoque mínimo</label>
+        <label class="form-label">Stock mínimo</label>
         <input type="number" name="min_stock" class="input" min="0" value="{{ product.min_stock if product else 5 }}">
       </div>
     </div>
 
     <div class="form-row">
       <div class="form-group">
-        <label class="form-label">Categoria</label>
-        <input type="text" name="category" class="input" value="{{ product.category if product else '' }}" placeholder="Ex: Alimentos, Bebidas...">
+        <label class="form-label">Categoría</label>
+        <input type="text" name="category" class="input" value="{{ product.category if product else '' }}" placeholder="Ej: Alimentos, Bebidas...">
       </div>
       <div class="form-group">
-        <label class="form-label">Unidade</label>
+        <label class="form-label">Unidad</label>
         <select name="unit" class="input select">
           {% for u in ['un', 'kg', 'g', 'l', 'ml', 'cx', 'pct', 'm'] %}
           <option value="{{ u }}" {% if product and product.unit == u %}selected{% endif %}>{{ u }}</option>
@@ -70,7 +70,7 @@
       <a href="{{ url_for('inventory') }}" class="btn btn-outline">Cancelar</a>
       <button type="submit" class="btn btn-primary">
         <i class="fa-solid fa-save"></i>
-        {% if product %}Salvar alterações{% else %}Cadastrar produto{% endif %}
+        {% if product %}Guardar cambios{% else %}Registrar producto{% endif %}
       </button>
     </div>
   </form>

@@ -161,7 +161,7 @@ def new_customer():
         )
         db.session.add(c)
         db.session.commit()
-        flash('Cliente cadastrado com sucesso!', 'success')
+        flash('¡Cliente registrado con éxito!', 'success')
         return redirect(url_for('customer_detail', id=c.id))
     return render_template('customer_form.html', customer=None)
 
@@ -182,7 +182,7 @@ def edit_customer(id):
         c.address = request.form.get('address', '')
         c.notes = request.form.get('notes', '')
         db.session.commit()
-        flash('Cliente atualizado!', 'success')
+        flash('¡Cliente actualizado!', 'success')
         return redirect(url_for('customer_detail', id=c.id))
     return render_template('customer_form.html', customer=c)
 
@@ -191,19 +191,19 @@ def delete_customer(id):
     c = Customer.query.get_or_404(id)
     db.session.delete(c)
     db.session.commit()
-    flash('Cliente removido.', 'info')
+    flash('Cliente eliminado.', 'info')
     return redirect(url_for('customers'))
 
 @app.route('/customers/<int:id>/whatsapp')
 def whatsapp_reminder(id):
     c = Customer.query.get_or_404(id)
     total = c.total_debt
-    msg = f"Olá {c.name}! Passando para lembrar que você tem um saldo devedor de R$ {total:.2f} em nossa loja. Qualquer dúvida estamos à disposição!"
+    msg = f"Hola {c.name}! Le recordamos que tiene un saldo pendiente de $ {total:.2f} en nuestro negocio. Quedamos a su disposición para cualquier consulta."
     phone = c.phone.replace(' ', '').replace('-', '').replace('(', '').replace(')', '').replace('+', '')
     if phone.startswith('0'):
-        phone = '55' + phone[1:]
-    elif not phone.startswith('55'):
-        phone = '55' + phone
+        phone = '54' + phone[1:]
+    elif not phone.startswith('54'):
+        phone = '54' + phone
     url = f"https://wa.me/{phone}?text={msg}"
     return redirect(url)
 
@@ -238,7 +238,7 @@ def new_debt():
         )
         db.session.add(d)
         db.session.commit()
-        flash('Dívida registrada!', 'success')
+        flash('¡Deuda registrada!', 'success')
         return redirect(url_for('customer_detail', id=d.customer_id))
     preselect = request.args.get('customer_id')
     return render_template('debt_form.html', customers=customers, preselect=preselect)
@@ -252,7 +252,7 @@ def pay_debt(id):
     d.paid = (d.paid or 0) + amount
     db.session.add(p)
     db.session.commit()
-    flash(f'Pagamento de R$ {amount:.2f} registrado!', 'success')
+    flash(f'¡Pago de $ {amount:.2f} registrado!', 'success')
     return redirect(url_for('customer_detail', id=d.customer_id))
 
 @app.route('/debts/<int:id>/delete', methods=['POST'])
@@ -261,7 +261,7 @@ def delete_debt(id):
     cid = d.customer_id
     db.session.delete(d)
     db.session.commit()
-    flash('Dívida removida.', 'info')
+    flash('Deuda eliminada.', 'info')
     return redirect(url_for('customer_detail', id=cid))
 
 # ─── Inventory ────────────────────────────────────────────────────────────────
@@ -298,7 +298,7 @@ def new_product():
         )
         db.session.add(p)
         db.session.commit()
-        flash('Produto cadastrado!', 'success')
+        flash('¡Producto registrado!', 'success')
         return redirect(url_for('inventory'))
     return render_template('product_form.html', product=None)
 
@@ -315,7 +315,7 @@ def edit_product(id):
         p.category = request.form.get('category', '')
         p.unit = request.form.get('unit', 'un')
         db.session.commit()
-        flash('Produto atualizado!', 'success')
+        flash('¡Producto actualizado!', 'success')
         return redirect(url_for('inventory'))
     return render_template('product_form.html', product=p)
 
@@ -324,7 +324,7 @@ def delete_product(id):
     p = Product.query.get_or_404(id)
     db.session.delete(p)
     db.session.commit()
-    flash('Produto removido.', 'info')
+    flash('Producto eliminado.', 'info')
     return redirect(url_for('inventory'))
 
 @app.route('/inventory/<int:id>/adjust', methods=['POST'])
@@ -358,7 +358,7 @@ def product_search():
 def barcode_image(id):
     p = Product.query.get_or_404(id)
     if not p.barcode_value:
-        return 'No barcode', 404
+        return 'Sin código de barras', 404
     try:
         buf = BytesIO()
         EAN = barcode.get_barcode_class('code128')
@@ -367,16 +367,16 @@ def barcode_image(id):
         buf.seek(0)
         return send_file(buf, mimetype='image/png')
     except Exception:
-        return 'Error generating barcode', 500
+        return 'Error al generar el código de barras', 500
 
 # ─── Sales ────────────────────────────────────────────────────────────────────
 
 PAYMENT_LABELS = {
-    'cash': 'Dinheiro',
-    'card_credit': 'Cartão de Crédito',
-    'card_debit': 'Cartão de Débito',
-    'pix': 'PIX',
-    'debt': 'Fiado (dívida)',
+    'cash': 'Efectivo',
+    'card_credit': 'Tarjeta de Crédito',
+    'card_debit': 'Tarjeta de Débito',
+    'pix': 'Transferencia',
+    'debt': 'Fiado (deuda)',
 }
 
 @app.route('/sales')
@@ -415,7 +415,7 @@ def sale_register():
 def sale_register_post():
     data = request.get_json()
     if not data or not data.get('items'):
-        return jsonify({'error': 'Carrinho vazio'}), 400
+        return jsonify({'error': 'El carrito está vacío'}), 400
 
     items_data = data['items']
     payment_method = data.get('payment_method', 'cash')
@@ -426,7 +426,7 @@ def sale_register_post():
     charged_to_debt = (payment_method == 'debt')
 
     if charged_to_debt and not customer_id:
-        return jsonify({'error': 'Selecione um cliente para registrar como fiado'}), 400
+        return jsonify({'error': 'Seleccione un cliente para registrar como fiado'}), 400
 
     sale = Sale(
         customer_id=int(customer_id) if customer_id else None,
@@ -464,7 +464,7 @@ def sale_register_post():
         items_summary = ', '.join(f"{i['quantity']}x {i['name']}" for i in items_data)
         debt = Debt(
             customer_id=int(customer_id),
-            description=f"Venda #{sale.id}: {items_summary}"[:255],
+            description=f"Venta #{sale.id}: {items_summary}"[:255],
             amount=total,
         )
         db.session.add(debt)
@@ -487,7 +487,7 @@ def delete_sale(id):
                 p.stock += int(item.quantity)
     db.session.delete(s)
     db.session.commit()
-    flash('Venda cancelada e estoque restaurado.', 'info')
+    flash('Venta cancelada y stock restaurado.', 'info')
     return redirect(url_for('sales'))
 
 # ─── API: stats ────────────────────────────────────────────────────────────────

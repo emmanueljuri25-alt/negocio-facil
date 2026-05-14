@@ -1,13 +1,13 @@
 {% extends "base.html" %}
-{% block title %}Painel — Gestão da Loja{% endblock %}
+{% block title %}Panel — Gestión Comercial{% endblock %}
 {% block content %}
 <div class="page-header">
   <div>
-    <h1><i class="fa-solid fa-gauge"></i> Painel</h1>
-    <span class="page-subtitle">Visão geral do seu negócio</span>
+    <h1><i class="fa-solid fa-gauge"></i> Panel</h1>
+    <span class="page-subtitle">Resumen general de su negocio</span>
   </div>
   <a href="{{ url_for('sale_register') }}" class="btn btn-primary">
-    <i class="fa-solid fa-cash-register"></i> Nova Venda
+    <i class="fa-solid fa-cash-register"></i> Nueva Venta
   </a>
 </div>
 
@@ -15,10 +15,10 @@
   <div class="stat-card stat-emerald">
     <div class="stat-icon"><i class="fa-solid fa-circle-dollar-to-slot"></i></div>
     <div class="stat-info">
-      <div class="stat-value">R$ {{ "%.2f"|format(today_revenue) }}</div>
-      <div class="stat-label">Receita hoje ({{ today_count }} venda{{ 's' if today_count != 1 else '' }})</div>
+      <div class="stat-value">$ {{ "%.2f"|format(today_revenue) }}</div>
+      <div class="stat-label">Ingresos hoy ({{ today_count }} venta{{ 's' if today_count != 1 else '' }})</div>
     </div>
-    <a href="{{ url_for('sales') }}" class="stat-link">Ver vendas →</a>
+    <a href="{{ url_for('sales') }}" class="stat-link">Ver ventas →</a>
   </div>
 
   <div class="stat-card stat-blue">
@@ -34,25 +34,25 @@
     <div class="stat-icon"><i class="fa-solid fa-boxes-stacked"></i></div>
     <div class="stat-info">
       <div class="stat-value">{{ total_products }}</div>
-      <div class="stat-label">Produtos</div>
+      <div class="stat-label">Productos</div>
     </div>
-    <a href="{{ url_for('inventory') }}" class="stat-link">Ver estoque →</a>
+    <a href="{{ url_for('inventory') }}" class="stat-link">Ver inventario →</a>
   </div>
 
   <div class="stat-card stat-red">
     <div class="stat-icon"><i class="fa-solid fa-file-invoice-dollar"></i></div>
     <div class="stat-info">
-      <div class="stat-value">R$ {{ "%.2f"|format(total_debt) }}</div>
-      <div class="stat-label">Total em dívidas</div>
+      <div class="stat-value">$ {{ "%.2f"|format(total_debt) }}</div>
+      <div class="stat-label">Total en deudas</div>
     </div>
-    <a href="{{ url_for('debts') }}" class="stat-link">Ver dívidas →</a>
+    <a href="{{ url_for('debts') }}" class="stat-link">Ver deudas →</a>
   </div>
 
   <div class="stat-card {% if overdue_count > 0 %}stat-orange{% else %}stat-gray{% endif %}">
     <div class="stat-icon"><i class="fa-solid fa-clock"></i></div>
     <div class="stat-info">
       <div class="stat-value">{{ overdue_count }}</div>
-      <div class="stat-label">Dívidas vencidas</div>
+      <div class="stat-label">Deudas vencidas</div>
     </div>
     <a href="{{ url_for('debts', status='overdue') }}" class="stat-link">Ver vencidas →</a>
   </div>
@@ -62,7 +62,7 @@
   {% if recent_sales %}
   <div class="card">
     <div class="card-header">
-      <h2><i class="fa-solid fa-cash-register text-emerald"></i> Vendas Recentes</h2>
+      <h2><i class="fa-solid fa-cash-register text-emerald"></i> Ventas Recientes</h2>
       <a href="{{ url_for('sales') }}" class="btn btn-sm btn-outline">Ver todas</a>
     </div>
     <div class="card-body">
@@ -71,12 +71,12 @@
         <li class="list-item">
           <div class="list-item-main">
             <a href="{{ url_for('sale_detail', id=s.id) }}" class="list-item-title" style="text-decoration:none;color:inherit">
-              #{{ s.id }} — {{ s.customer.name if s.customer else 'Anônimo' }}
+              #{{ s.id }} — {{ s.customer.name if s.customer else 'Anónimo' }}
             </a>
             <span class="list-item-sub">{{ s.created_at.strftime('%d/%m %H:%M') }}</span>
           </div>
           <span class="badge {% if s.charged_to_debt %}badge-red{% elif s.payment_method == 'cash' %}badge-green{% else %}badge-blue{% endif %}">
-            R$ {{ "%.2f"|format(s.total) }}
+            $ {{ "%.2f"|format(s.total) }}
           </span>
         </li>
         {% endfor %}
@@ -88,7 +88,7 @@
   {% if low_stock_products %}
   <div class="card">
     <div class="card-header">
-      <h2><i class="fa-solid fa-triangle-exclamation text-orange"></i> Estoque Baixo</h2>
+      <h2><i class="fa-solid fa-triangle-exclamation text-orange"></i> Stock Bajo</h2>
       <a href="{{ url_for('inventory', low='1') }}" class="btn btn-sm btn-outline">Ver todos</a>
     </div>
     <div class="card-body">
@@ -110,7 +110,7 @@
   {% if recent_payments %}
   <div class="card">
     <div class="card-header">
-      <h2><i class="fa-solid fa-money-bill-wave text-green"></i> Pagamentos Recentes</h2>
+      <h2><i class="fa-solid fa-money-bill-wave text-green"></i> Cobros Recientes</h2>
     </div>
     <div class="card-body">
       <ul class="simple-list">
@@ -120,7 +120,7 @@
             <span class="list-item-title">{{ p.debt.customer.name }}</span>
             <span class="list-item-sub">{{ p.paid_at.strftime('%d/%m/%Y') }}</span>
           </div>
-          <span class="badge badge-green">+ R$ {{ "%.2f"|format(p.amount) }}</span>
+          <span class="badge badge-green">+ $ {{ "%.2f"|format(p.amount) }}</span>
         </li>
         {% endfor %}
       </ul>
@@ -132,12 +132,12 @@
 {% if not recent_sales and not low_stock_products and not recent_payments %}
 <div class="empty-state">
   <i class="fa-solid fa-store"></i>
-  <h2>Bem-vindo ao sistema!</h2>
-  <p>Comece cadastrando seus clientes e produtos.</p>
+  <h2>¡Bienvenido al sistema!</h2>
+  <p>Comience registrando sus clientes y productos.</p>
   <div class="empty-actions">
-    <a href="{{ url_for('new_customer') }}" class="btn btn-primary"><i class="fa-solid fa-user-plus"></i> Novo Cliente</a>
-    <a href="{{ url_for('new_product') }}" class="btn btn-secondary"><i class="fa-solid fa-plus"></i> Novo Produto</a>
-    <a href="{{ url_for('sale_register') }}" class="btn btn-outline"><i class="fa-solid fa-cash-register"></i> Registrar Venda</a>
+    <a href="{{ url_for('new_customer') }}" class="btn btn-primary"><i class="fa-solid fa-user-plus"></i> Nuevo Cliente</a>
+    <a href="{{ url_for('new_product') }}" class="btn btn-secondary"><i class="fa-solid fa-plus"></i> Nuevo Producto</a>
+    <a href="{{ url_for('sale_register') }}" class="btn btn-outline"><i class="fa-solid fa-cash-register"></i> Registrar Venta</a>
   </div>
 </div>
 {% endif %}

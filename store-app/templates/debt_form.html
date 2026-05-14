@@ -1,10 +1,10 @@
 {% extends "base.html" %}
-{% block title %}Nova Dívida{% endblock %}
+{% block title %}Nueva Deuda{% endblock %}
 {% block content %}
 <div class="page-header">
   <h1>
     <a href="{{ url_for('debts') }}" class="back-link"><i class="fa-solid fa-arrow-left"></i></a>
-    Nova Dívida
+    Nueva Deuda
   </h1>
 </div>
 
@@ -13,7 +13,7 @@
     <div class="form-group">
       <label class="form-label">Cliente <span class="required">*</span></label>
       <select name="customer_id" class="input select" required>
-        <option value="">Selecione um cliente...</option>
+        <option value="">Seleccione un cliente...</option>
         {% for c in customers %}
         <option value="{{ c.id }}" {% if preselect and preselect|int == c.id %}selected{% endif %}>
           {{ c.name }} {% if c.phone %}— {{ c.phone }}{% endif %}
@@ -22,23 +22,23 @@
       </select>
     </div>
     <div class="form-group">
-      <label class="form-label">Descrição</label>
-      <input type="text" name="description" class="input" placeholder="Ex: Compra de mercadoria">
+      <label class="form-label">Descripción</label>
+      <input type="text" name="description" class="input" placeholder="Ej: Compra de mercadería">
     </div>
     <div class="form-row">
       <div class="form-group">
-        <label class="form-label">Valor (R$) <span class="required">*</span></label>
-        <input type="number" name="amount" class="input" step="0.01" min="0.01" required placeholder="0,00">
+        <label class="form-label">Importe ($) <span class="required">*</span></label>
+        <input type="number" name="amount" class="input" step="0.01" min="0.01" required placeholder="0.00">
       </div>
       <div class="form-group">
-        <label class="form-label">Data de vencimento</label>
+        <label class="form-label">Fecha de vencimiento</label>
         <input type="date" name="due_date" class="input">
       </div>
     </div>
     <div class="form-actions">
       <a href="{{ url_for('debts') }}" class="btn btn-outline">Cancelar</a>
       <button type="submit" class="btn btn-primary">
-        <i class="fa-solid fa-save"></i> Registrar dívida
+        <i class="fa-solid fa-save"></i> Registrar deuda
       </button>
     </div>
   </form>
