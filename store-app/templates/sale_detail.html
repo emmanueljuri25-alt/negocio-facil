@@ -1,0 +1,81 @@
+{% extends "base.html" %}
+{% block title %}Venda #{{ sale.id }}{% endblock %}
+{% block content %}
+<div class="page-header">
+  <h1>
+    <a href="{{ url_for('sales') }}" class="back-link"><i class="fa-solid fa-arrow-left"></i></a>
+    <i class="fa-solid fa-receipt"></i> Venda #{{ sale.id }}
+  </h1>
+  <div class="header-actions">
+    <form method="post" action="{{ url_for('delete_sale', id=sale.id) }}" onsubmit="return confirm('Cancelar esta venda e restaurar o estoque?')">
+      <button type="submit" class="btn btn-danger-outline btn-sm"><i class="fa-solid fa-ban"></i> Cancelar venda</button>
+    </form>
+  </div>
+</div>
+
+<div class="receipt-card">
+  <div class="receipt-header">
+    <div class="receipt-meta-grid">
+      <div>
+        <span class="info-label"><i class="fa-solid fa-calendar"></i> Data</span>
+        <span>{{ sale.created_at.strftime('%d/%m/%Y às %H:%M') }}</span>
+      </div>
+      <div>
+        <span class="info-label"><i class="fa-solid fa-money-bill"></i> Pagamento</span>
+        <span class="badge {% if sale.charged_to_debt %}badge-red{% elif sale.payment_method == 'cash' %}badge-green{% elif sale.payment_method == 'pix' %}badge-blue{% else %}badge-orange{% endif %}">
+          {{ payment_labels.get(sale.payment_method, sale.payment_method) }}
+        </span>
+      </div>
+      {% if sale.customer %}
+      <div>
+        <span class="info-label"><i class="fa-solid fa-user"></i> Cliente</span>
+        <a href="{{ url_for('customer_detail', id=sale.customer_id) }}">{{ sale.customer.name }}</a>
+      </div>
+      {% endif %}
+      {% if sale.note %}
+      <div>
+        <span class="info-label"><i class="fa-solid fa-note-sticky"></i> Obs.</span>
+        <span>{{ sale.note }}</span>
+      </div>
+      {% endif %}
+    </div>
+    {% if sale.charged_to_debt %}
+    <div class="debt-notice">
+      <i class="fa-solid fa-triangle-exclamation"></i> Esta venda foi registrada como fiado (dívida) para o cliente.
+    </div>
+    {% endif %}
+  </div>
+
+  <table class="receipt-table">
+    <thead>
+      <tr>
+        <th>Produto</th>
+        <th>Preço unit.</th>
+        <th>Qtd</th>
+        <th>Subtotal</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for item in sale.items %}
+      <tr>
+        <td>
+          {{ item.product_name }}
+          {% if item.product %}
+          <a href="{{ url_for('edit_product', id=item.product_id) }}" class="text-muted" style="font-size:.75rem;margin-left:.3rem;"><i class="fa-solid fa-arrow-up-right-from-square"></i></a>
+          {% endif %}
+        </td>
+        <td>R$ {{ "%.2f"|format(item.unit_price) }}</td>
+        <td>{{ item.quantity | int if item.quantity == item.quantity | int else item.quantity }}</td>
+        <td>R$ {{ "%.2f"|format(item.subtotal) }}</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+    <tfoot>
+      <tr class="receipt-total-row">
+        <td colspan="3"><strong>Total</strong></td>
+        <td><strong>R$ {{ "%.2f"|format(sale.total) }}</strong></td>
+      </tr>
+    </tfoot>
+  </table>
+</div>
+{% endblock %}

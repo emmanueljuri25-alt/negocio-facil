@@ -2,11 +2,25 @@
 {% block title %}Painel — Gestão da Loja{% endblock %}
 {% block content %}
 <div class="page-header">
-  <h1><i class="fa-solid fa-gauge"></i> Painel</h1>
-  <span class="page-subtitle">Visão geral do seu negócio</span>
+  <div>
+    <h1><i class="fa-solid fa-gauge"></i> Painel</h1>
+    <span class="page-subtitle">Visão geral do seu negócio</span>
+  </div>
+  <a href="{{ url_for('sale_register') }}" class="btn btn-primary">
+    <i class="fa-solid fa-cash-register"></i> Nova Venda
+  </a>
 </div>
 
-<div class="stats-grid">
+<div class="stats-grid stats-grid-5">
+  <div class="stat-card stat-emerald">
+    <div class="stat-icon"><i class="fa-solid fa-circle-dollar-to-slot"></i></div>
+    <div class="stat-info">
+      <div class="stat-value">R$ {{ "%.2f"|format(today_revenue) }}</div>
+      <div class="stat-label">Receita hoje ({{ today_count }} venda{{ 's' if today_count != 1 else '' }})</div>
+    </div>
+    <a href="{{ url_for('sales') }}" class="stat-link">Ver vendas →</a>
+  </div>
+
   <div class="stat-card stat-blue">
     <div class="stat-icon"><i class="fa-solid fa-users"></i></div>
     <div class="stat-info">
@@ -45,6 +59,32 @@
 </div>
 
 <div class="dashboard-grid">
+  {% if recent_sales %}
+  <div class="card">
+    <div class="card-header">
+      <h2><i class="fa-solid fa-cash-register text-emerald"></i> Vendas Recentes</h2>
+      <a href="{{ url_for('sales') }}" class="btn btn-sm btn-outline">Ver todas</a>
+    </div>
+    <div class="card-body">
+      <ul class="simple-list">
+        {% for s in recent_sales %}
+        <li class="list-item">
+          <div class="list-item-main">
+            <a href="{{ url_for('sale_detail', id=s.id) }}" class="list-item-title" style="text-decoration:none;color:inherit">
+              #{{ s.id }} — {{ s.customer.name if s.customer else 'Anônimo' }}
+            </a>
+            <span class="list-item-sub">{{ s.created_at.strftime('%d/%m %H:%M') }}</span>
+          </div>
+          <span class="badge {% if s.charged_to_debt %}badge-red{% elif s.payment_method == 'cash' %}badge-green{% else %}badge-blue{% endif %}">
+            R$ {{ "%.2f"|format(s.total) }}
+          </span>
+        </li>
+        {% endfor %}
+      </ul>
+    </div>
+  </div>
+  {% endif %}
+
   {% if low_stock_products %}
   <div class="card">
     <div class="card-header">
@@ -89,7 +129,7 @@
   {% endif %}
 </div>
 
-{% if not low_stock_products and not recent_payments %}
+{% if not recent_sales and not low_stock_products and not recent_payments %}
 <div class="empty-state">
   <i class="fa-solid fa-store"></i>
   <h2>Bem-vindo ao sistema!</h2>
@@ -97,6 +137,7 @@
   <div class="empty-actions">
     <a href="{{ url_for('new_customer') }}" class="btn btn-primary"><i class="fa-solid fa-user-plus"></i> Novo Cliente</a>
     <a href="{{ url_for('new_product') }}" class="btn btn-secondary"><i class="fa-solid fa-plus"></i> Novo Produto</a>
+    <a href="{{ url_for('sale_register') }}" class="btn btn-outline"><i class="fa-solid fa-cash-register"></i> Registrar Venda</a>
   </div>
 </div>
 {% endif %}

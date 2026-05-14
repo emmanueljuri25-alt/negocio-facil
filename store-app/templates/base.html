@@ -39,6 +39,11 @@
           <i class="fa-solid fa-boxes-stacked"></i> Estoque
         </a>
       </li>
+      <li>
+        <a href="{{ url_for('sales') }}" class="{% if 'sale' in request.endpoint %}active{% endif %}">
+          <i class="fa-solid fa-cash-register"></i> Vendas
+        </a>
+      </li>
     </ul>
   </nav>
 

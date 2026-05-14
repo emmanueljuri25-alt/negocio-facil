@@ -1,0 +1,77 @@
+{% extends "base.html" %}
+{% block title %}Vendas{% endblock %}
+{% block content %}
+<div class="page-header">
+  <h1><i class="fa-solid fa-cash-register"></i> Vendas</h1>
+  <a href="{{ url_for('sale_register') }}" class="btn btn-primary">
+    <i class="fa-solid fa-plus"></i> Nova Venda
+  </a>
+</div>
+
+<div class="search-bar">
+  <form method="get">
+    <div class="filter-row">
+      <div class="form-group" style="margin:0;flex:1">
+        <input type="date" name="date" value="{{ date_filter }}" class="input" onchange="this.form.submit()">
+      </div>
+      <select name="method" class="input select select-sm" onchange="this.form.submit()">
+        <option value="">Todos os pagamentos</option>
+        {% for key, label in payment_labels.items() %}
+        <option value="{{ key }}" {% if method_filter == key %}selected{% endif %}>{{ label }}</option>
+        {% endfor %}
+      </select>
+      {% if date_filter or method_filter %}
+      <a href="{{ url_for('sales') }}" class="btn btn-outline btn-sm">Limpar</a>
+      {% endif %}
+    </div>
+  </form>
+</div>
+
+{% if sales.items %}
+<div class="sales-summary-bar">
+  <span><strong>{{ sales.total }}</strong> venda(s) encontrada(s)</span>
+  <span class="sales-total-shown">Total: <strong>R$ {{ "%.2f"|format(total_shown) }}</strong></span>
+</div>
+
+<div class="list-cards">
+  {% for s in sales.items %}
+  <a href="{{ url_for('sale_detail', id=s.id) }}" class="sale-card">
+    <div class="sale-card-left">
+      <div class="sale-id">#{{ s.id }}</div>
+      <div class="sale-date">{{ s.created_at.strftime('%d/%m/%Y %H:%M') }}</div>
+      {% if s.customer %}<div class="sale-customer"><i class="fa-solid fa-user"></i> {{ s.customer.name }}</div>{% endif %}
+    </div>
+    <div class="sale-card-right">
+      <div class="sale-total">R$ {{ "%.2f"|format(s.total) }}</div>
+      <span class="badge {% if s.charged_to_debt %}badge-red{% elif s.payment_method == 'cash' %}badge-green{% elif s.payment_method == 'pix' %}badge-blue{% else %}badge-orange{% endif %}">
+        {{ payment_labels.get(s.payment_method, s.payment_method) }}
+      </span>
+      <div class="sale-items-count">{{ s.item_count }} item(s)</div>
+    </div>
+    <i class="fa-solid fa-chevron-right text-muted"></i>
+  </a>
+  {% endfor %}
+</div>
+
+{% if sales.pages > 1 %}
+<div class="pagination">
+  {% if sales.has_prev %}
+  <a href="{{ url_for('sales', page=sales.prev_num, date=date_filter, method=method_filter) }}" class="btn btn-outline btn-sm">← Anterior</a>
+  {% endif %}
+  <span class="page-info">Página {{ sales.page }} de {{ sales.pages }}</span>
+  {% if sales.has_next %}
+  <a href="{{ url_for('sales', page=sales.next_num, date=date_filter, method=method_filter) }}" class="btn btn-outline btn-sm">Próxima →</a>
+  {% endif %}
+</div>
+{% endif %}
+
+{% else %}
+<div class="empty-state">
+  <i class="fa-solid fa-cash-register"></i>
+  <p>{% if date_filter or method_filter %}Nenhuma venda encontrada com esses filtros.{% else %}Nenhuma venda registrada ainda.{% endif %}</p>
+  {% if not date_filter and not method_filter %}
+  <a href="{{ url_for('sale_register') }}" class="btn btn-primary">Registrar primeira venda</a>
+  {% endif %}
+</div>
+{% endif %}
+{% endblock %}
