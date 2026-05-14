@@ -1,0 +1,50 @@
+{% extends "base.html" %}
+{% block title %}Clientes{% endblock %}
+{% block content %}
+<div class="page-header">
+  <div>
+    <h1><i class="fa-solid fa-users"></i> Clientes</h1>
+  </div>
+  <a href="{{ url_for('new_customer') }}" class="btn btn-primary">
+    <i class="fa-solid fa-user-plus"></i> Novo Cliente
+  </a>
+</div>
+
+<div class="search-bar">
+  <form method="get">
+    <div class="input-group">
+      <i class="fa-solid fa-search input-icon"></i>
+      <input type="text" name="q" value="{{ q }}" placeholder="Buscar por nome ou telefone..." class="input" autofocus>
+      {% if q %}<a href="{{ url_for('customers') }}" class="input-clear"><i class="fa-solid fa-xmark"></i></a>{% endif %}
+    </div>
+  </form>
+</div>
+
+{% if customers %}
+<div class="list-cards">
+  {% for c in customers %}
+  <a href="{{ url_for('customer_detail', id=c.id) }}" class="customer-card">
+    <div class="customer-avatar">{{ c.name[0].upper() }}</div>
+    <div class="customer-info">
+      <div class="customer-name">{{ c.name }}</div>
+      {% if c.phone %}<div class="customer-meta"><i class="fa-solid fa-phone"></i> {{ c.phone }}</div>{% endif %}
+    </div>
+    <div class="customer-debt">
+      {% if c.total_debt > 0 %}
+        <span class="badge badge-red">R$ {{ "%.2f"|format(c.total_debt) }}</span>
+      {% else %}
+        <span class="badge badge-green">Quite</span>
+      {% endif %}
+    </div>
+    <i class="fa-solid fa-chevron-right text-muted"></i>
+  </a>
+  {% endfor %}
+</div>
+{% else %}
+<div class="empty-state">
+  <i class="fa-solid fa-users"></i>
+  <p>{% if q %}Nenhum cliente encontrado para "{{ q }}".{% else %}Nenhum cliente cadastrado ainda.{% endif %}</p>
+  {% if not q %}<a href="{{ url_for('new_customer') }}" class="btn btn-primary">Cadastrar primeiro cliente</a>{% endif %}
+</div>
+{% endif %}
+{% endblock %}

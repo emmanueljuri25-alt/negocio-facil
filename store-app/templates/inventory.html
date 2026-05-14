@@ -1,0 +1,143 @@
+{% extends "base.html" %}
+{% block title %}Estoque{% endblock %}
+{% block content %}
+<div class="page-header">
+  <h1><i class="fa-solid fa-boxes-stacked"></i> Estoque</h1>
+  <a href="{{ url_for('new_product') }}" class="btn btn-primary">
+    <i class="fa-solid fa-plus"></i> Novo Produto
+  </a>
+</div>
+
+<div class="search-bar">
+  <form method="get" id="filterForm">
+    <div class="filter-row">
+      <div class="input-group flex-1">
+        <i class="fa-solid fa-search input-icon"></i>
+        <input type="text" name="q" value="{{ q }}" placeholder="Buscar produto ou código de barras..." class="input">
+      </div>
+      {% if categories %}
+      <select name="cat" class="input select select-sm" onchange="document.getElementById('filterForm').submit()">
+        <option value="">Todas categorias</option>
+        {% for c in categories %}
+        <option value="{{ c }}" {% if cat == c %}selected{% endif %}>{{ c }}</option>
+        {% endfor %}
+      </select>
+      {% endif %}
+      <label class="checkbox-label">
+        <input type="checkbox" name="low" value="1" {% if low %}checked{% endif %} onchange="document.getElementById('filterForm').submit()">
+        Estoque baixo
+      </label>
+    </div>
+  </form>
+</div>
+
+<div class="barcode-scanner-bar">
+  <button class="btn btn-outline btn-sm" onclick="toggleScanner()">
+    <i class="fa-solid fa-barcode"></i> Escanear código de barras
+  </button>
+  <div id="scannerArea" style="display:none" class="scanner-area">
+    <input type="text" id="barcodeInput" class="input" placeholder="Digite ou escaneie o código..." autofocus>
+    <button class="btn btn-primary btn-sm" onclick="lookupBarcode()">Buscar</button>
+  </div>
+  <div id="barcodeResult"></div>
+</div>
+
+{% if products %}
+<div class="product-table-wrap">
+  <table class="product-table">
+    <thead>
+      <tr>
+        <th>Produto</th>
+        <th>Código</th>
+        <th>Categoria</th>
+        <th>Preço</th>
+        <th>Estoque</th>
+        <th>Ações</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for p in products %}
+      <tr class="{% if p.low_stock %}row-warning{% endif %}">
+        <td>
+          <div class="product-name">{{ p.name }}</div>
+          {% if p.low_stock %}<span class="badge badge-orange badge-xs">Estoque baixo</span>{% endif %}
+        </td>
+        <td>
+          {% if p.barcode_value %}
+          <span class="barcode-text">{{ p.barcode_value }}</span>
+          <a href="{{ url_for('barcode_image', id=p.id) }}" target="_blank" class="barcode-img-link"><i class="fa-solid fa-barcode"></i></a>
+          {% else %}
+          <span class="text-muted">—</span>
+          {% endif %}
+        </td>
+        <td>{{ p.category or '—' }}</td>
+        <td>R$ {{ "%.2f"|format(p.price) }}</td>
+        <td>
+          <div class="stock-control">
+            <button class="stock-btn" onclick="adjustStock({{ p.id }}, -1, this)">−</button>
+            <span class="stock-value" id="stock-{{ p.id }}">{{ p.stock }} {{ p.unit }}</span>
+            <button class="stock-btn" onclick="adjustStock({{ p.id }}, 1, this)">+</button>
+          </div>
+        </td>
+        <td>
+          <div class="table-actions">
+            <a href="{{ url_for('edit_product', id=p.id) }}" class="btn btn-xs btn-outline"><i class="fa-solid fa-pen"></i></a>
+            <form method="post" action="{{ url_for('delete_product', id=p.id) }}" onsubmit="return confirm('Remover este produto?')">
+              <button type="submit" class="btn btn-xs btn-danger-outline"><i class="fa-solid fa-trash"></i></button>
+            </form>
+          </div>
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% else %}
+<div class="empty-state">
+  <i class="fa-solid fa-boxes-stacked"></i>
+  <p>{% if q %}Nenhum produto encontrado.{% else %}Nenhum produto cadastrado ainda.{% endif %}</p>
+  {% if not q %}<a href="{{ url_for('new_product') }}" class="btn btn-primary">Cadastrar primeiro produto</a>{% endif %}
+</div>
+{% endif %}
+
+<script>
+function adjustStock(id, delta, btn) {
+  fetch('/inventory/' + id + '/adjust', {
+    method: 'POST',
+    headers: {'Content-Type': 'application/x-www-form-urlencoded'},
+    body: 'delta=' + delta
+  }).then(r => r.json()).then(data => {
+    const el = document.getElementById('stock-' + id);
+    if (el) el.textContent = data.stock + ' un';
+    const row = btn.closest('tr');
+    if (data.low_stock) row.classList.add('row-warning');
+    else row.classList.remove('row-warning');
+  });
+}
+
+function toggleScanner() {
+  const area = document.getElementById('scannerArea');
+  area.style.display = area.style.display === 'none' ? 'flex' : 'none';
+  if (area.style.display === 'flex') document.getElementById('barcodeInput').focus();
+}
+
+function lookupBarcode() {
+  const code = document.getElementById('barcodeInput').value.trim();
+  if (!code) return;
+  fetch('/inventory/barcode-lookup?code=' + encodeURIComponent(code))
+    .then(r => r.json())
+    .then(data => {
+      const el = document.getElementById('barcodeResult');
+      if (data.found) {
+        el.innerHTML = '<div class="barcode-found">Encontrado: <strong>' + data.name + '</strong> — Preço: R$ ' + data.price.toFixed(2) + ' — Estoque: ' + data.stock + ' <a href="/inventory/' + data.id + '/edit" class="btn btn-xs btn-outline">Editar</a></div>';
+      } else {
+        el.innerHTML = '<div class="barcode-not-found">Produto não encontrado para o código: ' + code + '</div>';
+      }
+    });
+}
+
+document.getElementById('barcodeInput')?.addEventListener('keydown', e => {
+  if (e.key === 'Enter') lookupBarcode();
+});
+</script>
+{% endblock %}

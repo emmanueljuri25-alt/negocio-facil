@@ -1,0 +1,21 @@
+kind = "web"
+previewPath = "/"
+title = "Gestão da Loja"
+version = "1.0.0"
+id = "artifacts/store"
+router = "path"
+
+[[integratedSkills]]
+name = "react-vite"
+version = "1.0.0"
+
+[[services]]
+name = "web"
+paths = [ "/" ]
+localPort = 3000
+
+[services.development]
+run = "cd /home/runner/workspace/store-app && python app.py"
+
+[services.env]
+PORT = "3000"

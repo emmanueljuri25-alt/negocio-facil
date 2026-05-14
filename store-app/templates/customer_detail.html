@@ -1,0 +1,142 @@
+{% extends "base.html" %}
+{% block title %}{{ customer.name }}{% endblock %}
+{% block content %}
+<div class="page-header">
+  <div>
+    <h1>
+      <a href="{{ url_for('customers') }}" class="back-link"><i class="fa-solid fa-arrow-left"></i></a>
+      {{ customer.name }}
+    </h1>
+    {% if customer.phone %}<div class="page-subtitle"><i class="fa-solid fa-phone"></i> {{ customer.phone }}</div>{% endif %}
+  </div>
+  <div class="header-actions">
+    {% if customer.phone %}
+    <a href="{{ url_for('whatsapp_reminder', id=customer.id) }}" class="btn btn-whatsapp" target="_blank">
+      <i class="fa-brands fa-whatsapp"></i> WhatsApp
+    </a>
+    {% endif %}
+    <a href="{{ url_for('edit_customer', id=customer.id) }}" class="btn btn-outline">
+      <i class="fa-solid fa-pen"></i> Editar
+    </a>
+    <form method="post" action="{{ url_for('delete_customer', id=customer.id) }}" onsubmit="return confirm('Remover este cliente e todas as suas dívidas?')">
+      <button type="submit" class="btn btn-danger-outline">
+        <i class="fa-solid fa-trash"></i>
+      </button>
+    </form>
+  </div>
+</div>
+
+{% if customer.email or customer.address or customer.notes %}
+<div class="card mb-4">
+  <div class="card-body info-grid">
+    {% if customer.email %}<div><span class="info-label"><i class="fa-solid fa-envelope"></i> E-mail</span><span>{{ customer.email }}</span></div>{% endif %}
+    {% if customer.address %}<div><span class="info-label"><i class="fa-solid fa-location-dot"></i> Endereço</span><span>{{ customer.address }}</span></div>{% endif %}
+    {% if customer.notes %}<div><span class="info-label"><i class="fa-solid fa-note-sticky"></i> Notas</span><span>{{ customer.notes }}</span></div>{% endif %}
+  </div>
+</div>
+{% endif %}
+
+<div class="debt-summary">
+  <div class="debt-total {% if customer.total_debt > 0 %}debt-has-balance{% else %}debt-clear{% endif %}">
+    <span class="debt-total-label">Saldo devedor total</span>
+    <span class="debt-total-value">R$ {{ "%.2f"|format(customer.total_debt) }}</span>
+  </div>
+</div>
+
+<div class="section-header">
+  <h2><i class="fa-solid fa-file-invoice-dollar"></i> Dívidas</h2>
+  <a href="{{ url_for('new_debt', customer_id=customer.id) }}" class="btn btn-primary btn-sm">
+    <i class="fa-solid fa-plus"></i> Nova dívida
+  </a>
+</div>
+
+{% if debts %}
+<div class="list-cards">
+  {% for d in debts %}
+  <div class="debt-card debt-{{ d.status }}">
+    <div class="debt-card-header">
+      <div>
+        <div class="debt-description">{{ d.description or 'Dívida' }}</div>
+        <div class="debt-date">{{ d.created_at.strftime('%d/%m/%Y') }}
+          {% if d.due_date %} · Vence: {{ d.due_date.strftime('%d/%m/%Y') }}{% endif %}
+        </div>
+      </div>
+      <div class="debt-amounts">
+        <div class="debt-remaining">R$ {{ "%.2f"|format(d.remaining) }}</div>
+        <div class="debt-original">de R$ {{ "%.2f"|format(d.amount) }}</div>
+        <span class="badge badge-{{ 'green' if d.status == 'paid' else 'red' if d.status == 'overdue' else 'orange' }}">
+          {{ 'Pago' if d.status == 'paid' else 'Vencido' if d.status == 'overdue' else 'Pendente' }}
+        </span>
+      </div>
+    </div>
+
+    {% if d.payments %}
+    <div class="payment-history">
+      <div class="payment-history-title">Pagamentos:</div>
+      {% for p in d.payments %}
+      <div class="payment-entry">
+        <span>{{ p.paid_at.strftime('%d/%m/%Y') }} — R$ {{ "%.2f"|format(p.amount) }}</span>
+        {% if p.note %}<span class="text-muted">{{ p.note }}</span>{% endif %}
+      </div>
+      {% endfor %}
+    </div>
+    {% endif %}
+
+    {% if d.remaining > 0 %}
+    <div class="debt-card-actions">
+      <button class="btn btn-sm btn-success" onclick="openPayModal({{ d.id }}, {{ d.remaining }})">
+        <i class="fa-solid fa-money-bill-wave"></i> Registrar pagamento
+      </button>
+      <form method="post" action="{{ url_for('delete_debt', id=d.id) }}" onsubmit="return confirm('Remover esta dívida?')" style="display:inline">
+        <button type="submit" class="btn btn-sm btn-danger-outline"><i class="fa-solid fa-trash"></i></button>
+      </form>
+    </div>
+    {% endif %}
+  </div>
+  {% endfor %}
+</div>
+{% else %}
+<div class="empty-state empty-state-sm">
+  <i class="fa-solid fa-check-circle text-green"></i>
+  <p>Este cliente não tem dívidas registradas.</p>
+</div>
+{% endif %}
+
+<!-- Payment Modal -->
+<div class="modal-overlay" id="payModal" style="display:none">
+  <div class="modal">
+    <div class="modal-header">
+      <h3>Registrar Pagamento</h3>
+      <button onclick="closePayModal()" class="modal-close">×</button>
+    </div>
+    <form method="post" id="payForm">
+      <div class="modal-body">
+        <div class="form-group">
+          <label class="form-label">Valor (R$) <span class="required">*</span></label>
+          <input type="number" name="amount" id="payAmount" class="input" step="0.01" min="0.01" required>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Observação</label>
+          <input type="text" name="note" class="input" placeholder="Ex: Pago em dinheiro">
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" onclick="closePayModal()" class="btn btn-outline">Cancelar</button>
+        <button type="submit" class="btn btn-success"><i class="fa-solid fa-check"></i> Confirmar</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<script>
+function openPayModal(debtId, remaining) {
+  document.getElementById('payForm').action = '/debts/' + debtId + '/pay';
+  document.getElementById('payAmount').value = remaining.toFixed(2);
+  document.getElementById('payAmount').max = remaining;
+  document.getElementById('payModal').style.display = 'flex';
+}
+function closePayModal() {
+  document.getElementById('payModal').style.display = 'none';
+}
+</script>
+{% endblock %}

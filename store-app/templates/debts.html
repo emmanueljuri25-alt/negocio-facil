@@ -1,0 +1,61 @@
+{% extends "base.html" %}
+{% block title %}Dívidas{% endblock %}
+{% block content %}
+<div class="page-header">
+  <h1><i class="fa-solid fa-file-invoice-dollar"></i> Dívidas</h1>
+  <a href="{{ url_for('new_debt') }}" class="btn btn-primary">
+    <i class="fa-solid fa-plus"></i> Nova Dívida
+  </a>
+</div>
+
+<div class="filter-tabs">
+  <a href="{{ url_for('debts') }}" class="tab {% if status_filter == 'all' %}active{% endif %}">Todas</a>
+  <a href="{{ url_for('debts', status='pending') }}" class="tab {% if status_filter == 'pending' %}active{% endif %}">Pendentes</a>
+  <a href="{{ url_for('debts', status='overdue') }}" class="tab {% if status_filter == 'overdue' %}active{% endif %}">Vencidas</a>
+  <a href="{{ url_for('debts', status='paid') }}" class="tab {% if status_filter == 'paid' %}active{% endif %}">Pagas</a>
+</div>
+
+{% if debts %}
+<div class="list-cards">
+  {% for d in debts %}
+  <div class="debt-card debt-{{ d.status }}">
+    <div class="debt-card-header">
+      <div>
+        <a href="{{ url_for('customer_detail', id=d.customer_id) }}" class="debt-customer-link">
+          <i class="fa-solid fa-user"></i> {{ d.customer.name }}
+        </a>
+        <div class="debt-description">{{ d.description or 'Dívida' }}</div>
+        <div class="debt-date">{{ d.created_at.strftime('%d/%m/%Y') }}
+          {% if d.due_date %} · Vence: {{ d.due_date.strftime('%d/%m/%Y') }}{% endif %}
+        </div>
+      </div>
+      <div class="debt-amounts">
+        <div class="debt-remaining">R$ {{ "%.2f"|format(d.remaining) }}</div>
+        <div class="debt-original">de R$ {{ "%.2f"|format(d.amount) }}</div>
+        <span class="badge badge-{{ 'green' if d.status == 'paid' else 'red' if d.status == 'overdue' else 'orange' }}">
+          {{ 'Pago' if d.status == 'paid' else 'Vencido' if d.status == 'overdue' else 'Pendente' }}
+        </span>
+      </div>
+    </div>
+    {% if d.remaining > 0 %}
+    <div class="debt-card-actions">
+      <a href="{{ url_for('customer_detail', id=d.customer_id) }}" class="btn btn-sm btn-success">
+        <i class="fa-solid fa-money-bill-wave"></i> Receber
+      </a>
+      {% if d.customer.phone %}
+      <a href="{{ url_for('whatsapp_reminder', id=d.customer_id) }}" class="btn btn-sm btn-whatsapp" target="_blank">
+        <i class="fa-brands fa-whatsapp"></i>
+      </a>
+      {% endif %}
+    </div>
+    {% endif %}
+  </div>
+  {% endfor %}
+</div>
+{% else %}
+<div class="empty-state">
+  <i class="fa-solid fa-check-circle"></i>
+  <p>Nenhuma dívida encontrada.</p>
+</div>
+{% endif %}
+{% endblock %}

@@ -1,0 +1,103 @@
+{% extends "base.html" %}
+{% block title %}Painel — Gestão da Loja{% endblock %}
+{% block content %}
+<div class="page-header">
+  <h1><i class="fa-solid fa-gauge"></i> Painel</h1>
+  <span class="page-subtitle">Visão geral do seu negócio</span>
+</div>
+
+<div class="stats-grid">
+  <div class="stat-card stat-blue">
+    <div class="stat-icon"><i class="fa-solid fa-users"></i></div>
+    <div class="stat-info">
+      <div class="stat-value">{{ total_customers }}</div>
+      <div class="stat-label">Clientes</div>
+    </div>
+    <a href="{{ url_for('customers') }}" class="stat-link">Ver todos →</a>
+  </div>
+
+  <div class="stat-card stat-green">
+    <div class="stat-icon"><i class="fa-solid fa-boxes-stacked"></i></div>
+    <div class="stat-info">
+      <div class="stat-value">{{ total_products }}</div>
+      <div class="stat-label">Produtos</div>
+    </div>
+    <a href="{{ url_for('inventory') }}" class="stat-link">Ver estoque →</a>
+  </div>
+
+  <div class="stat-card stat-red">
+    <div class="stat-icon"><i class="fa-solid fa-file-invoice-dollar"></i></div>
+    <div class="stat-info">
+      <div class="stat-value">R$ {{ "%.2f"|format(total_debt) }}</div>
+      <div class="stat-label">Total em dívidas</div>
+    </div>
+    <a href="{{ url_for('debts') }}" class="stat-link">Ver dívidas →</a>
+  </div>
+
+  <div class="stat-card {% if overdue_count > 0 %}stat-orange{% else %}stat-gray{% endif %}">
+    <div class="stat-icon"><i class="fa-solid fa-clock"></i></div>
+    <div class="stat-info">
+      <div class="stat-value">{{ overdue_count }}</div>
+      <div class="stat-label">Dívidas vencidas</div>
+    </div>
+    <a href="{{ url_for('debts', status='overdue') }}" class="stat-link">Ver vencidas →</a>
+  </div>
+</div>
+
+<div class="dashboard-grid">
+  {% if low_stock_products %}
+  <div class="card">
+    <div class="card-header">
+      <h2><i class="fa-solid fa-triangle-exclamation text-orange"></i> Estoque Baixo</h2>
+      <a href="{{ url_for('inventory', low='1') }}" class="btn btn-sm btn-outline">Ver todos</a>
+    </div>
+    <div class="card-body">
+      <ul class="simple-list">
+        {% for p in low_stock_products[:5] %}
+        <li class="list-item">
+          <div class="list-item-main">
+            <span class="list-item-title">{{ p.name }}</span>
+            <span class="badge badge-orange">{{ p.stock }} {{ p.unit }}</span>
+          </div>
+          <a href="{{ url_for('edit_product', id=p.id) }}" class="btn btn-xs btn-outline">Editar</a>
+        </li>
+        {% endfor %}
+      </ul>
+    </div>
+  </div>
+  {% endif %}
+
+  {% if recent_payments %}
+  <div class="card">
+    <div class="card-header">
+      <h2><i class="fa-solid fa-money-bill-wave text-green"></i> Pagamentos Recentes</h2>
+    </div>
+    <div class="card-body">
+      <ul class="simple-list">
+        {% for p in recent_payments %}
+        <li class="list-item">
+          <div class="list-item-main">
+            <span class="list-item-title">{{ p.debt.customer.name }}</span>
+            <span class="list-item-sub">{{ p.paid_at.strftime('%d/%m/%Y') }}</span>
+          </div>
+          <span class="badge badge-green">+ R$ {{ "%.2f"|format(p.amount) }}</span>
+        </li>
+        {% endfor %}
+      </ul>
+    </div>
+  </div>
+  {% endif %}
+</div>
+
+{% if not low_stock_products and not recent_payments %}
+<div class="empty-state">
+  <i class="fa-solid fa-store"></i>
+  <h2>Bem-vindo ao sistema!</h2>
+  <p>Comece cadastrando seus clientes e produtos.</p>
+  <div class="empty-actions">
+    <a href="{{ url_for('new_customer') }}" class="btn btn-primary"><i class="fa-solid fa-user-plus"></i> Novo Cliente</a>
+    <a href="{{ url_for('new_product') }}" class="btn btn-secondary"><i class="fa-solid fa-plus"></i> Novo Produto</a>
+  </div>
+</div>
+{% endif %}
+{% endblock %}
