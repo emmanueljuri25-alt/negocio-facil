@@ -1,10 +1,10 @@
 {% extends "base.html" %}
-{% block title %}Inventario{% endblock %}
+{% block title %}Stock{% endblock %}
 {% block content %}
 <div class="page-header">
-  <h1><i class="fa-solid fa-boxes-stacked"></i> Inventario</h1>
+  <h1><i class="fa-solid fa-boxes-stacked"></i> Stock</h1>
   <a href="{{ url_for('new_product') }}" class="btn btn-primary">
-    <i class="fa-solid fa-plus"></i> Nuevo Producto
+    <i class="fa-solid fa-plus"></i> Nuevo producto
   </a>
 </div>
 
@@ -17,7 +17,7 @@
       </div>
       {% if categories %}
       <select name="cat" class="input select select-sm" onchange="document.getElementById('filterForm').submit()">
-        <option value="">Todas las categorías</option>
+        <option value="">Todas categorias</option>
         {% for c in categories %}
         <option value="{{ c }}" {% if cat == c %}selected{% endif %}>{{ c }}</option>
         {% endfor %}
@@ -25,7 +25,7 @@
       {% endif %}
       <label class="checkbox-label">
         <input type="checkbox" name="low" value="1" {% if low %}checked{% endif %} onchange="document.getElementById('filterForm').submit()">
-        Stock bajo
+        Stok bajo
       </label>
     </div>
   </form>
@@ -36,7 +36,7 @@
     <i class="fa-solid fa-barcode"></i> Escanear código de barras
   </button>
   <div id="scannerArea" style="display:none" class="scanner-area">
-    <input type="text" id="barcodeInput" class="input" placeholder="Ingrese o escanee el código..." autofocus>
+    <input type="text" id="barcodeInput" class="input" placeholder="Digite ou escaneie o código..." autofocus>
     <button class="btn btn-primary btn-sm" onclick="lookupBarcode()">Buscar</button>
   </div>
   <div id="barcodeResult"></div>
@@ -49,10 +49,10 @@
       <tr>
         <th>Producto</th>
         <th>Código</th>
-        <th>Categoría</th>
+        <th>Categoria</th>
         <th>Precio</th>
         <th>Stock</th>
-        <th>Acciones</th>
+        <th>Ações</th>
       </tr>
     </thead>
     <tbody>
@@ -60,7 +60,7 @@
       <tr class="{% if p.low_stock %}row-warning{% endif %}">
         <td>
           <div class="product-name">{{ p.name }}</div>
-          {% if p.low_stock %}<span class="badge badge-orange badge-xs">Stock bajo</span>{% endif %}
+          {% if p.low_stock %}<span class="badge badge-orange badge-xs">Estoque baixo</span>{% endif %}
         </td>
         <td>
           {% if p.barcode_value %}
@@ -71,7 +71,7 @@
           {% endif %}
         </td>
         <td>{{ p.category or '—' }}</td>
-        <td>$ {{ "%.2f"|format(p.price) }}</td>
+        <td>R$ {{ "%.2f"|format(p.price) }}</td>
         <td>
           <div class="stock-control">
             <button class="stock-btn" onclick="adjustStock({{ p.id }}, -1, this)">−</button>
@@ -82,7 +82,7 @@
         <td>
           <div class="table-actions">
             <a href="{{ url_for('edit_product', id=p.id) }}" class="btn btn-xs btn-outline"><i class="fa-solid fa-pen"></i></a>
-            <form method="post" action="{{ url_for('delete_product', id=p.id) }}" onsubmit="return confirm('¿Eliminar este producto?')">
+            <form method="post" action="{{ url_for('delete_product', id=p.id) }}" onsubmit="return confirm('Remover este produto?')">
               <button type="submit" class="btn btn-xs btn-danger-outline"><i class="fa-solid fa-trash"></i></button>
             </form>
           </div>
@@ -95,8 +95,8 @@
 {% else %}
 <div class="empty-state">
   <i class="fa-solid fa-boxes-stacked"></i>
-  <p>{% if q %}No se encontraron productos.{% else %}Todavía no hay productos registrados.{% endif %}</p>
-  {% if not q %}<a href="{{ url_for('new_product') }}" class="btn btn-primary">Registrar primer producto</a>{% endif %}
+  <p>{% if q %}Nenhum produto encontrado.{% else %}Nenhum produto cadastrado ainda.{% endif %}</p>
+  {% if not q %}<a href="{{ url_for('new_product') }}" class="btn btn-primary">Cadastrar primeiro produto</a>{% endif %}
 </div>
 {% endif %}
 
@@ -129,9 +129,9 @@ function lookupBarcode() {
     .then(data => {
       const el = document.getElementById('barcodeResult');
       if (data.found) {
-        el.innerHTML = '<div class="barcode-found">Encontrado: <strong>' + data.name + '</strong> — Precio: $ ' + data.price.toFixed(2) + ' — Stock: ' + data.stock + ' <a href="/inventory/' + data.id + '/edit" class="btn btn-xs btn-outline">Editar</a></div>';
+        el.innerHTML = '<div class="barcode-found">Encontrado: <strong>' + data.name + '</strong> — Preço: R$ ' + data.price.toFixed(2) + ' — Estoque: ' + data.stock + ' <a href="/inventory/' + data.id + '/edit" class="btn btn-xs btn-outline">Editar</a></div>';
       } else {
-        el.innerHTML = '<div class="barcode-not-found">No se encontró ningún producto con el código: ' + code + '</div>';
+        el.innerHTML = '<div class="barcode-not-found">Produto não encontrado para o código: ' + code + '</div>';
       }
     });
 }
