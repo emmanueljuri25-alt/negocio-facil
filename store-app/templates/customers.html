@@ -6,7 +6,7 @@
     <h1><i class="fa-solid fa-users"></i> Clientes</h1>
   </div>
   <a href="{{ url_for('new_customer') }}" class="btn btn-primary">
-    <i class="fa-solid fa-user-plus"></i> Nuevo Cliente
+    <i class="fa-solid fa-user-plus"></i> Novo Cliente
   </a>
 </div>
 
@@ -14,7 +14,7 @@
   <form method="get">
     <div class="input-group">
       <i class="fa-solid fa-search input-icon"></i>
-      <input type="text" name="q" value="{{ q }}" placeholder="Buscar por nombre o teléfono..." class="input" autofocus>
+      <input type="text" name="q" value="{{ q }}" placeholder="Buscar por nome ou telefone..." class="input" autofocus>
       {% if q %}<a href="{{ url_for('customers') }}" class="input-clear"><i class="fa-solid fa-xmark"></i></a>{% endif %}
     </div>
   </form>
@@ -31,9 +31,9 @@
     </div>
     <div class="customer-debt">
       {% if c.total_debt > 0 %}
-        <span class="badge badge-red">$ {{ "%.2f"|format(c.total_debt) }}</span>
+        <span class="badge badge-red">R$ {{ "%.2f"|format(c.total_debt) }}</span>
       {% else %}
-        <span class="badge badge-green">Al día</span>
+        <span class="badge badge-green">Quite</span>
       {% endif %}
     </div>
     <i class="fa-solid fa-chevron-right text-muted"></i>
@@ -43,8 +43,8 @@
 {% else %}
 <div class="empty-state">
   <i class="fa-solid fa-users"></i>
-  <p>{% if q %}No se encontraron clientes para "{{ q }}".{% else %}Todavía no hay clientes registrados.{% endif %}</p>
-  {% if not q %}<a href="{{ url_for('new_customer') }}" class="btn btn-primary">Registrar primer cliente</a>{% endif %}
+  <p>{% if q %}Nenhum cliente encontrado para "{{ q }}".{% else %}Nenhum cliente cadastrado ainda.{% endif %}</p>
+  {% if not q %}<a href="{{ url_for('new_customer') }}" class="btn btn-primary">Cadastrar primeiro cliente</a>{% endif %}
 </div>
 {% endif %}
 {% endblock %}

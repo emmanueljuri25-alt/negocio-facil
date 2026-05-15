@@ -18,7 +18,7 @@
     <a href="{{ url_for('edit_customer', id=customer.id) }}" class="btn btn-outline">
       <i class="fa-solid fa-pen"></i> Editar
     </a>
-    <form method="post" action="{{ url_for('delete_customer', id=customer.id) }}" onsubmit="return confirm('¿Eliminar este cliente y todas sus deudas?')">
+    <form method="post" action="{{ url_for('delete_customer', id=customer.id) }}" onsubmit="return confirm('Remover este cliente e todas as suas dívidas?')">
       <button type="submit" class="btn btn-danger-outline">
         <i class="fa-solid fa-trash"></i>
       </button>
@@ -30,7 +30,7 @@
 <div class="card mb-4">
   <div class="card-body info-grid">
     {% if customer.email %}<div><span class="info-label"><i class="fa-solid fa-envelope"></i> E-mail</span><span>{{ customer.email }}</span></div>{% endif %}
-    {% if customer.address %}<div><span class="info-label"><i class="fa-solid fa-location-dot"></i> Dirección</span><span>{{ customer.address }}</span></div>{% endif %}
+    {% if customer.address %}<div><span class="info-label"><i class="fa-solid fa-location-dot"></i> Endereço</span><span>{{ customer.address }}</span></div>{% endif %}
     {% if customer.notes %}<div><span class="info-label"><i class="fa-solid fa-note-sticky"></i> Notas</span><span>{{ customer.notes }}</span></div>{% endif %}
   </div>
 </div>
@@ -38,15 +38,15 @@
 
 <div class="debt-summary">
   <div class="debt-total {% if customer.total_debt > 0 %}debt-has-balance{% else %}debt-clear{% endif %}">
-    <span class="debt-total-label">Saldo deudor total</span>
-    <span class="debt-total-value">$ {{ "%.2f"|format(customer.total_debt) }}</span>
+    <span class="debt-total-label">Saldo devedor total</span>
+    <span class="debt-total-value">R$ {{ "%.2f"|format(customer.total_debt) }}</span>
   </div>
 </div>
 
 <div class="section-header">
-  <h2><i class="fa-solid fa-file-invoice-dollar"></i> Deudas</h2>
+  <h2><i class="fa-solid fa-file-invoice-dollar"></i> Dívidas</h2>
   <a href="{{ url_for('new_debt', customer_id=customer.id) }}" class="btn btn-primary btn-sm">
-    <i class="fa-solid fa-plus"></i> Nueva deuda
+    <i class="fa-solid fa-plus"></i> Nova dívida
   </a>
 </div>
 
@@ -56,26 +56,26 @@
   <div class="debt-card debt-{{ d.status }}">
     <div class="debt-card-header">
       <div>
-        <div class="debt-description">{{ d.description or 'Deuda' }}</div>
+        <div class="debt-description">{{ d.description or 'Dívida' }}</div>
         <div class="debt-date">{{ d.created_at.strftime('%d/%m/%Y') }}
           {% if d.due_date %} · Vence: {{ d.due_date.strftime('%d/%m/%Y') }}{% endif %}
         </div>
       </div>
       <div class="debt-amounts">
-        <div class="debt-remaining">$ {{ "%.2f"|format(d.remaining) }}</div>
-        <div class="debt-original">de $ {{ "%.2f"|format(d.amount) }}</div>
+        <div class="debt-remaining">R$ {{ "%.2f"|format(d.remaining) }}</div>
+        <div class="debt-original">de R$ {{ "%.2f"|format(d.amount) }}</div>
         <span class="badge badge-{{ 'green' if d.status == 'paid' else 'red' if d.status == 'overdue' else 'orange' }}">
-          {{ 'Pagado' if d.status == 'paid' else 'Vencido' if d.status == 'overdue' else 'Pendiente' }}
+          {{ 'Pago' if d.status == 'paid' else 'Vencido' if d.status == 'overdue' else 'Pendente' }}
         </span>
       </div>
     </div>
 
     {% if d.payments %}
     <div class="payment-history">
-      <div class="payment-history-title">Cobros:</div>
+      <div class="payment-history-title">Pagamentos:</div>
       {% for p in d.payments %}
       <div class="payment-entry">
-        <span>{{ p.paid_at.strftime('%d/%m/%Y') }} — $ {{ "%.2f"|format(p.amount) }}</span>
+        <span>{{ p.paid_at.strftime('%d/%m/%Y') }} — R$ {{ "%.2f"|format(p.amount) }}</span>
         {% if p.note %}<span class="text-muted">{{ p.note }}</span>{% endif %}
       </div>
       {% endfor %}
@@ -85,9 +85,9 @@
     {% if d.remaining > 0 %}
     <div class="debt-card-actions">
       <button class="btn btn-sm btn-success" onclick="openPayModal({{ d.id }}, {{ d.remaining }})">
-        <i class="fa-solid fa-money-bill-wave"></i> Registrar cobro
+        <i class="fa-solid fa-money-bill-wave"></i> Registrar pagamento
       </button>
-      <form method="post" action="{{ url_for('delete_debt', id=d.id) }}" onsubmit="return confirm('¿Eliminar esta deuda?')" style="display:inline">
+      <form method="post" action="{{ url_for('delete_debt', id=d.id) }}" onsubmit="return confirm('Remover esta dívida?')" style="display:inline">
         <button type="submit" class="btn btn-sm btn-danger-outline"><i class="fa-solid fa-trash"></i></button>
       </form>
     </div>
@@ -98,26 +98,26 @@
 {% else %}
 <div class="empty-state empty-state-sm">
   <i class="fa-solid fa-check-circle text-green"></i>
-  <p>Este cliente no tiene deudas registradas.</p>
+  <p>Este cliente não tem dívidas registradas.</p>
 </div>
 {% endif %}
 
-<!-- Modal de cobro -->
+<!-- Payment Modal -->
 <div class="modal-overlay" id="payModal" style="display:none">
   <div class="modal">
     <div class="modal-header">
-      <h3>Registrar Cobro</h3>
+      <h3>Registrar Pagamento</h3>
       <button onclick="closePayModal()" class="modal-close">×</button>
     </div>
     <form method="post" id="payForm">
       <div class="modal-body">
         <div class="form-group">
-          <label class="form-label">Importe ($) <span class="required">*</span></label>
+          <label class="form-label">Valor (R$) <span class="required">*</span></label>
           <input type="number" name="amount" id="payAmount" class="input" step="0.01" min="0.01" required>
         </div>
         <div class="form-group">
-          <label class="form-label">Observación</label>
-          <input type="text" name="note" class="input" placeholder="Ej: Pagado en efectivo">
+          <label class="form-label">Observação</label>
+          <input type="text" name="note" class="input" placeholder="Ex: Pago em dinheiro">
         </div>
       </div>
       <div class="modal-footer">
@@ -130,9 +130,9 @@
 
 {% if sales %}
 <div class="section-header">
-  <h2><i class="fa-solid fa-cash-register"></i> Compras Recientes</h2>
+  <h2><i class="fa-solid fa-cash-register"></i> Compras Recentes</h2>
   <a href="{{ url_for('sale_register') }}?customer_id={{ customer.id }}" class="btn btn-primary btn-sm">
-    <i class="fa-solid fa-plus"></i> Nueva venta
+    <i class="fa-solid fa-plus"></i> Nova venda
   </a>
 </div>
 <div class="list-cards">
@@ -143,9 +143,9 @@
       <div class="sale-date">{{ s.created_at.strftime('%d/%m/%Y %H:%M') }}</div>
     </div>
     <div class="sale-card-right">
-      <div class="sale-total">$ {{ "%.2f"|format(s.total) }}</div>
+      <div class="sale-total">R$ {{ "%.2f"|format(s.total) }}</div>
       <span class="badge {% if s.charged_to_debt %}badge-red{% elif s.payment_method == 'cash' %}badge-green{% else %}badge-blue{% endif %}">
-        {{ 'Fiado' if s.charged_to_debt else ('Efectivo' if s.payment_method == 'cash' else s.payment_method) }}
+        {{ 'Fiado' if s.charged_to_debt else ('Dinheiro' if s.payment_method == 'cash' else s.payment_method) }}
       </span>
     </div>
     <i class="fa-solid fa-chevron-right text-muted"></i>

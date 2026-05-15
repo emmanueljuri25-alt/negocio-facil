@@ -1,65 +1,65 @@
 {% extends "base.html" %}
-{% block title %}Registrar Venta{% endblock %}
+{% block title %}Registrar Venda{% endblock %}
 {% block content %}
 <div class="page-header">
   <h1>
     <a href="{{ url_for('sales') }}" class="back-link"><i class="fa-solid fa-arrow-left"></i></a>
-    <i class="fa-solid fa-cash-register"></i> Registrar Venta
+    <i class="fa-solid fa-cash-register"></i> Registrar Venda
   </h1>
-  <span class="page-subtitle" id="cartSummary">Carrito vacío</span>
+  <span class="page-subtitle" id="cartSummary">Carrinho vazio</span>
 </div>
 
 <div class="register-layout">
 
-  <!-- Izquierda: búsqueda de productos + carrito -->
+  <!-- Left: Product search + cart -->
   <div class="register-left">
 
-    <!-- Buscador / código de barras -->
+    <!-- Barcode / search input -->
     <div class="card mb-4">
       <div class="card-header">
-        <h2><i class="fa-solid fa-barcode"></i> Agregar producto</h2>
+        <h2><i class="fa-solid fa-barcode"></i> Adicionar produto</h2>
       </div>
       <div class="card-body">
         <div class="input-group mb-2">
           <i class="fa-solid fa-search input-icon"></i>
-          <input type="text" id="productSearch" class="input" placeholder="Ingrese el nombre o escanee el código de barras..." autocomplete="off">
+          <input type="text" id="productSearch" class="input" placeholder="Digite o nome ou escaneie o código de barras..." autocomplete="off">
         </div>
         <div id="searchResults" class="search-dropdown"></div>
 
-        <!-- Ítem manual -->
+        <!-- Manual item fallback -->
         <details class="manual-item-details">
-          <summary>Agregar ítem manual (sin registro)</summary>
+          <summary>Adicionar item manual (sem cadastro)</summary>
           <div class="manual-item-form">
-            <input type="text" id="manualName" class="input" placeholder="Nombre del ítem">
-            <input type="number" id="manualPrice" class="input" step="0.01" min="0" placeholder="Precio $">
-            <input type="number" id="manualQty" class="input" step="1" min="1" value="1" placeholder="Cant.">
+            <input type="text" id="manualName" class="input" placeholder="Nome do item">
+            <input type="number" id="manualPrice" class="input" step="0.01" min="0" placeholder="Preço R$">
+            <input type="number" id="manualQty" class="input" step="1" min="1" value="1" placeholder="Qtd">
             <button class="btn btn-outline btn-sm" onclick="addManualItem()">
-              <i class="fa-solid fa-plus"></i> Agregar
+              <i class="fa-solid fa-plus"></i> Adicionar
             </button>
           </div>
         </details>
       </div>
     </div>
 
-    <!-- Carrito -->
+    <!-- Cart -->
     <div class="card">
       <div class="card-header">
-        <h2><i class="fa-solid fa-cart-shopping"></i> Carrito</h2>
+        <h2><i class="fa-solid fa-cart-shopping"></i> Carrinho</h2>
         <button class="btn btn-xs btn-danger-outline" onclick="clearCart()" id="clearCartBtn" style="display:none">
-          <i class="fa-solid fa-trash"></i> Vaciar
+          <i class="fa-solid fa-trash"></i> Limpar
         </button>
       </div>
       <div class="card-body" id="cartBody">
         <div class="empty-state empty-state-sm" id="cartEmpty">
           <i class="fa-solid fa-cart-shopping"></i>
-          <p>No hay productos agregados.</p>
+          <p>Nenhum produto adicionado.</p>
         </div>
         <table class="cart-table" id="cartTable" style="display:none">
           <thead>
             <tr>
-              <th>Producto</th>
-              <th>Precio</th>
-              <th>Cant.</th>
+              <th>Produto</th>
+              <th>Preço</th>
+              <th>Qtd</th>
               <th>Subtotal</th>
               <th></th>
             </tr>
@@ -68,7 +68,7 @@
           <tfoot>
             <tr class="cart-total-row">
               <td colspan="3"><strong>Total</strong></td>
-              <td colspan="2"><strong id="cartTotal">$ 0,00</strong></td>
+              <td colspan="2"><strong id="cartTotal">R$ 0,00</strong></td>
             </tr>
           </tfoot>
         </table>
@@ -76,16 +76,16 @@
     </div>
   </div>
 
-  <!-- Derecha: opciones de cobro -->
+  <!-- Right: Payment options -->
   <div class="register-right">
     <div class="card">
       <div class="card-header">
-        <h2><i class="fa-solid fa-money-bill-wave"></i> Cobro</h2>
+        <h2><i class="fa-solid fa-money-bill-wave"></i> Pagamento</h2>
       </div>
       <div class="card-body">
 
         <div class="form-group">
-          <label class="form-label">Forma de pago</label>
+          <label class="form-label">Forma de pagamento</label>
           <div class="payment-methods" id="paymentMethods">
             {% for key, label in payment_labels.items() %}
             <button type="button"
@@ -102,7 +102,7 @@
         <div class="form-group" id="customerSection" style="display:none">
           <label class="form-label">Cliente <span class="required">*</span></label>
           <select id="customerSelect" class="input select">
-            <option value="">Seleccione el cliente...</option>
+            <option value="">Selecione o cliente...</option>
             {% for c in customers %}
             <option value="{{ c.id }}">{{ c.name }}{% if c.phone %} — {{ c.phone }}{% endif %}</option>
             {% endfor %}
@@ -113,7 +113,7 @@
         <div class="form-group">
           <label class="form-label">Cliente (opcional)</label>
           <select id="customerOptional" class="input select">
-            <option value="">Ninguno (venta anónima)</option>
+            <option value="">Nenhum (venda anônima)</option>
             {% for c in customers %}
             <option value="{{ c.id }}">{{ c.name }}</option>
             {% endfor %}
@@ -121,17 +121,17 @@
         </div>
 
         <div class="form-group">
-          <label class="form-label">Observación</label>
-          <input type="text" id="saleNote" class="input" placeholder="Ej: Entrega a domicilio, vuelto...">
+          <label class="form-label">Observação</label>
+          <input type="text" id="saleNote" class="input" placeholder="Ex: Entrega domicílio, troco...">
         </div>
 
         <div class="sale-total-display">
           <span>Total a cobrar</span>
-          <span class="sale-total-value" id="saleTotalDisplay">$ 0,00</span>
+          <span class="sale-total-value" id="saleTotalDisplay">R$ 0,00</span>
         </div>
 
         <button class="btn btn-primary btn-block" id="finalizeSaleBtn" onclick="finalizeSale()" disabled>
-          <i class="fa-solid fa-check-circle"></i> Finalizar Venta
+          <i class="fa-solid fa-check-circle"></i> Finalizar Venda
         </button>
 
       </div>
@@ -139,11 +139,11 @@
   </div>
 </div>
 
-<!-- Modal de éxito -->
+<!-- Success modal -->
 <div class="modal-overlay" id="successModal" style="display:none">
   <div class="modal">
     <div class="modal-header" style="background: var(--success-light);">
-      <h3 style="color:var(--success)"><i class="fa-solid fa-circle-check"></i> ¡Venta Finalizada!</h3>
+      <h3 style="color:var(--success)"><i class="fa-solid fa-circle-check"></i> Venda Finalizada!</h3>
     </div>
     <div class="modal-body" style="text-align:center;">
       <div style="font-size:3rem;margin-bottom:.5rem;">🎉</div>
@@ -151,8 +151,8 @@
       <div id="successDetail" style="color:var(--gray-500);font-size:.9rem;"></div>
     </div>
     <div class="modal-footer">
-      <button class="btn btn-outline" onclick="viewSale()"><i class="fa-solid fa-receipt"></i> Ver comprobante</button>
-      <button class="btn btn-primary" onclick="newSale()"><i class="fa-solid fa-plus"></i> Nueva venta</button>
+      <button class="btn btn-outline" onclick="viewSale()"><i class="fa-solid fa-receipt"></i> Ver recibo</button>
+      <button class="btn btn-primary" onclick="newSale()"><i class="fa-solid fa-plus"></i> Nova venda</button>
     </div>
   </div>
 </div>
@@ -162,7 +162,7 @@ let cart = [];
 let selectedPayment = 'cash';
 let lastSaleId = null;
 
-// ── Búsqueda de productos ────────────────────────────────────────────────────
+// ── Product search ──────────────────────────────────────────────────────────
 const searchInput = document.getElementById('productSearch');
 let searchTimeout;
 
@@ -171,6 +171,7 @@ searchInput.addEventListener('input', function() {
   const q = this.value.trim();
   if (!q) { closeDropdown(); return; }
   searchTimeout = setTimeout(() => {
+    // Try barcode lookup first
     fetch('/inventory/barcode-lookup?code=' + encodeURIComponent(q))
       .then(r => r.json())
       .then(data => {
@@ -198,14 +199,14 @@ document.addEventListener('click', function(e) {
 function showDropdown(products) {
   const el = document.getElementById('searchResults');
   if (!products.length) {
-    el.innerHTML = '<div class="dropdown-empty">No se encontraron productos</div>';
+    el.innerHTML = '<div class="dropdown-empty">Nenhum produto encontrado</div>';
     el.style.display = 'block';
     return;
   }
   el.innerHTML = products.map(p => `
     <div class="dropdown-item" onclick="addToCart(${p.id}, ${JSON.stringify(p.name)}, ${p.price}, ${p.stock}, '${p.unit}'); searchInput.value=''; closeDropdown()">
       <span class="dropdown-name">${p.name}</span>
-      <span class="dropdown-meta">$ ${p.price.toFixed(2)} · Stock: ${p.stock} ${p.unit}</span>
+      <span class="dropdown-meta">R$ ${p.price.toFixed(2)} · Estoque: ${p.stock} ${p.unit}</span>
     </div>
   `).join('');
   el.style.display = 'block';
@@ -215,12 +216,12 @@ function closeDropdown() {
   document.getElementById('searchResults').style.display = 'none';
 }
 
-// ── Carrito ──────────────────────────────────────────────────────────────────
+// ── Cart ────────────────────────────────────────────────────────────────────
 function addToCart(id, name, price, stock, unit) {
   const existing = cart.find(i => i.product_id == id);
   if (existing) {
     if (id && existing.quantity >= stock) {
-      alert('Stock insuficiente. Máximo: ' + stock + ' ' + unit);
+      alert('Estoque insuficiente! Máximo: ' + stock + ' ' + unit);
       return;
     }
     existing.quantity++;
@@ -236,7 +237,7 @@ function addManualItem() {
   const name = document.getElementById('manualName').value.trim();
   const price = parseFloat(document.getElementById('manualPrice').value) || 0;
   const qty = parseInt(document.getElementById('manualQty').value) || 1;
-  if (!name || price <= 0) { alert('Complete el nombre y el precio.'); return; }
+  if (!name || price <= 0) { alert('Preencha o nome e o preço.'); return; }
   cart.push({ product_id: null, name, unit_price: price, quantity: qty, subtotal: +(price * qty).toFixed(2), stock: null, unit: 'un' });
   document.getElementById('manualName').value = '';
   document.getElementById('manualPrice').value = '';
@@ -248,7 +249,7 @@ function updateQty(idx, val) {
   const item = cart[idx];
   const qty = Math.max(1, parseInt(val) || 1);
   if (item.stock !== null && qty > item.stock) {
-    alert('Stock insuficiente.');
+    alert('Estoque insuficiente!');
     document.querySelectorAll('.cart-qty-input')[idx].value = item.quantity;
     return;
   }
@@ -287,9 +288,9 @@ function renderCart() {
   rows.innerHTML = cart.map((item, i) => `
     <tr>
       <td class="cart-item-name">${item.name}</td>
-      <td>$ ${item.unit_price.toFixed(2)}</td>
+      <td>R$ ${item.unit_price.toFixed(2)}</td>
       <td><input type="number" class="cart-qty-input" value="${item.quantity}" min="1" ${item.stock !== null ? 'max="' + item.stock + '"' : ''} onchange="updateQty(${i}, this.value)"></td>
-      <td>$ ${item.subtotal.toFixed(2)}</td>
+      <td>R$ ${item.subtotal.toFixed(2)}</td>
       <td><button class="btn btn-xs btn-danger-outline" onclick="removeItem(${i})"><i class="fa-solid fa-times"></i></button></td>
     </tr>
   `).join('');
@@ -299,16 +300,16 @@ function renderCart() {
 }
 
 function setTotal(total) {
-  const fmt = '$ ' + total.toFixed(2).replace('.', ',');
+  const fmt = 'R$ ' + total.toFixed(2).replace('.', ',');
   document.getElementById('cartTotal').textContent = fmt;
   document.getElementById('saleTotalDisplay').textContent = fmt;
   document.getElementById('cartSummary').textContent = cart.length
-    ? `${cart.reduce((s,i)=>s+i.quantity,0)} ítem(s) — ${fmt}`
-    : 'Carrito vacío';
+    ? `${cart.reduce((s,i)=>s+i.quantity,0)} itens — ${fmt}`
+    : 'Carrinho vazio';
   document.getElementById('finalizeSaleBtn').disabled = cart.length === 0;
 }
 
-// ── Forma de pago ─────────────────────────────────────────────────────────────
+// ── Payment ─────────────────────────────────────────────────────────────────
 function selectPayment(method) {
   selectedPayment = method;
   document.querySelectorAll('.pay-method-btn').forEach(b => b.classList.remove('active'));
@@ -318,7 +319,7 @@ function selectPayment(method) {
   document.getElementById('customerOptional').closest('.form-group').style.display = isDebt ? 'none' : 'block';
 }
 
-// ── Finalizar ──────────────────────────────────────────────────────────────────
+// ── Finalize ─────────────────────────────────────────────────────────────────
 function finalizeSale() {
   if (!cart.length) return;
   const isDebt = selectedPayment === 'debt';
@@ -327,7 +328,7 @@ function finalizeSale() {
     : document.getElementById('customerOptional').value;
 
   if (isDebt && !customerId) {
-    alert('Seleccione un cliente para registrar como fiado.');
+    alert('Selecione um cliente para registrar como fiado.');
     return;
   }
 
@@ -339,7 +340,7 @@ function finalizeSale() {
   };
 
   document.getElementById('finalizeSaleBtn').disabled = true;
-  document.getElementById('finalizeSaleBtn').innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Guardando...';
+  document.getElementById('finalizeSaleBtn').innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Salvando...';
 
   fetch('/sales/register', {
     method: 'POST',
@@ -351,21 +352,21 @@ function finalizeSale() {
     if (data.success) {
       lastSaleId = data.sale_id;
       const total = cart.reduce((s,i) => s+i.subtotal, 0);
-      document.getElementById('successMsg').textContent = '$ ' + total.toFixed(2).replace('.', ',');
+      document.getElementById('successMsg').textContent = 'R$ ' + total.toFixed(2).replace('.', ',');
       const methodLabels = {{ payment_labels | tojson }};
       document.getElementById('successDetail').textContent =
-        `Venta #${data.sale_id} · ${methodLabels[selectedPayment]}`;
+        `Venda #${data.sale_id} · ${methodLabels[selectedPayment]}`;
       document.getElementById('successModal').style.display = 'flex';
     } else {
-      alert('Error: ' + data.error);
+      alert('Erro: ' + data.error);
       document.getElementById('finalizeSaleBtn').disabled = false;
-      document.getElementById('finalizeSaleBtn').innerHTML = '<i class="fa-solid fa-check-circle"></i> Finalizar Venta';
+      document.getElementById('finalizeSaleBtn').innerHTML = '<i class="fa-solid fa-check-circle"></i> Finalizar Venda';
     }
   })
   .catch(() => {
-    alert('Error al registrar la venta.');
+    alert('Erro ao registrar venda.');
     document.getElementById('finalizeSaleBtn').disabled = false;
-    document.getElementById('finalizeSaleBtn').innerHTML = '<i class="fa-solid fa-check-circle"></i> Finalizar Venta';
+    document.getElementById('finalizeSaleBtn').innerHTML = '<i class="fa-solid fa-check-circle"></i> Finalizar Venda';
   });
 }
 
@@ -382,7 +383,7 @@ function newSale() {
   selectPayment('cash');
   document.getElementById('successModal').style.display = 'none';
   document.getElementById('finalizeSaleBtn').disabled = false;
-  document.getElementById('finalizeSaleBtn').innerHTML = '<i class="fa-solid fa-check-circle"></i> Finalizar Venta';
+  document.getElementById('finalizeSaleBtn').innerHTML = '<i class="fa-solid fa-check-circle"></i> Finalizar Venda';
   searchInput.focus();
 }
 </script>
