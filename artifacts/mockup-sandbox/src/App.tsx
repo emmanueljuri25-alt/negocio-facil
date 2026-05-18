@@ -157,8 +157,8 @@ function App() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-100 pb-24">
-      <header className="bg-black text-white p-5 shadow-xl sticky top-0 z-50">
+    <div className="min-h-screen bg-gradient-to-br from-slate-100 via-white to-indigo-100 pb-28">
+      <header className="bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-500 text-white p-6 rounded-b-3xl shadow-2xl sticky top-0 z-50">
         <h1 className="text-2xl font-bold">negocio-facil</h1>
         <p className="text-sm text-gray-300 mt-1">
           Gestión moderna para comercios argentinos
@@ -169,28 +169,28 @@ function App() {
         {pantalla === "inicio" && (
           <>
             <div className="grid grid-cols-2 gap-3">
-              <div className="bg-white rounded-3xl p-4 shadow-lg">
+              <div className="bg-white/90 backdrop-blur rounded-3xl p-5 shadow-xl border border-white/40">
                 <p className="text-sm text-gray-500">Clientes</p>
                 <h2 className="text-2xl font-bold mt-1">
                   {clientes.length}
                 </h2>
               </div>
 
-              <div className="bg-white rounded-3xl p-4 shadow-lg">
+              <div className="bg-white/90 backdrop-blur rounded-3xl p-5 shadow-xl border border-white/40">
                 <p className="text-sm text-gray-500">Fiado total</p>
                 <h2 className="text-xl font-bold mt-1 text-red-600">
                   ${totalFiado.toLocaleString("es-AR")}
                 </h2>
               </div>
 
-              <div className="bg-white rounded-3xl p-4 shadow-lg">
+              <div className="bg-white/90 backdrop-blur rounded-3xl p-5 shadow-xl border border-white/40">
                 <p className="text-sm text-gray-500">Caja diaria</p>
                 <h2 className="text-xl font-bold mt-1 text-green-600">
                   ${caja.toLocaleString("es-AR")}
                 </h2>
               </div>
 
-              <div className="bg-white rounded-3xl p-4 shadow-lg">
+              <div className="bg-white/90 backdrop-blur rounded-3xl p-5 shadow-xl border border-white/40">
                 <p className="text-sm text-gray-500">Proveedores</p>
                 <h2 className="text-2xl font-bold mt-1">
                   {proveedores.length}
@@ -198,7 +198,7 @@ function App() {
               </div>
             </div>
 
-            <div className="bg-white rounded-3xl p-5 shadow-lg">
+            <div className="bg-white/90 backdrop-blur rounded-3xl p-5 shadow-xl border border-white/40">
               <h2 className="text-xl font-bold mb-3">
                 Estado del negocio
               </h2>
@@ -258,7 +258,7 @@ function App() {
 
               <button
                 onClick={agregarCliente}
-                className="w-full bg-black text-white p-3 rounded-2xl font-semibold"
+                className="w-full bg-gradient-to-r from-indigo-600 to-purple-600 text-white p-4 rounded-2xl font-bold shadow-xl active:scale-95 transition-all"
               >
                 Guardar cliente
               </button>
@@ -268,7 +268,7 @@ function App() {
               {clientes.map((cliente) => (
                 <div
                   key={cliente.id}
-                  className="bg-white rounded-3xl p-4 shadow-lg"
+                  className="bg-white/90 backdrop-blur rounded-3xl p-5 shadow-xl border border-white/40"
                 >
                   <div className="flex justify-between items-start">
                     <div>
@@ -342,7 +342,7 @@ function App() {
 
               <button
                 onClick={agregarMovimiento}
-                className="w-full bg-black text-white p-3 rounded-2xl font-semibold"
+                className="w-full bg-gradient-to-r from-indigo-600 to-purple-600 text-white p-4 rounded-2xl font-bold shadow-xl active:scale-95 transition-all"
               >
                 Guardar movimiento
               </button>
@@ -352,7 +352,7 @@ function App() {
               {movimientos.map((movimiento) => (
                 <div
                   key={movimiento.id}
-                  className="bg-white rounded-3xl p-4 shadow-lg"
+                  className="bg-white/90 backdrop-blur rounded-3xl p-5 shadow-xl border border-white/40"
                 >
                   <div className="flex justify-between items-center">
                     <div>
@@ -417,7 +417,7 @@ function App() {
 
               <button
                 onClick={agregarProveedor}
-                className="w-full bg-black text-white p-3 rounded-2xl font-semibold"
+                className="w-full bg-gradient-to-r from-indigo-600 to-purple-600 text-white p-4 rounded-2xl font-bold shadow-xl active:scale-95 transition-all"
               >
                 Guardar proveedor
               </button>
@@ -427,7 +427,7 @@ function App() {
               {proveedores.map((proveedor) => (
                 <div
                   key={proveedor.id}
-                  className="bg-white rounded-3xl p-4 shadow-lg"
+                  className="bg-white/90 backdrop-blur rounded-3xl p-5 shadow-xl border border-white/40"
                 >
                   <div className="flex justify-between items-start">
                     <div>
@@ -458,7 +458,7 @@ function App() {
         )}
       </main>
 
-      <nav className="fixed bottom-0 left-0 right-0 bg-white border-t shadow-2xl flex justify-around p-3">
+      <nav className="fixed bottom-3 left-3 right-3 bg-white/90 backdrop-blur rounded-3xl shadow-2xl flex justify-around p-4 border border-gray-200">
         <button
           onClick={() => setPantalla("inicio")}
           className="text-sm font-semibold"
