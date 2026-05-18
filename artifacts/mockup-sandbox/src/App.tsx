@@ -1,676 +1,211 @@
-import { useEffect, useMemo, useState } from "react";
-
-type Cliente = {
-  id: number;
-  nombre: string;
-  telefono: string;
-  deuda: number;
-};
-
-type MovimientoCaja = {
-  id: number;
-  tipo: "Ingreso" | "Gasto";
-  descripcion: string;
-  monto: number;
-  fecha: string;
-};
-
-type Producto = {
-  id: number;
-  nombre: string;
-  categoria: string;
-  precioCompra: number;
-  precioVenta: number;
-  stock: number;
-};
-
-type Venta = {
-  id: number;
-  producto: string;
-  cantidad: number;
-  total: number;
-  ganancia: number;
-  fecha: string;
-};
-
-type Proveedor = {
-  id: number;
-  nombre: string;
-  telefono: string;
-  empresa: string;
-};
-
-function App() {
-  const [pantalla, setPantalla] = useState("inicio");
-
-  const [clientes, setClientes] = useState<Cliente[]>([]);
-  const [proveedores, setProveedores] = useState<Proveedor[]>([]);
-  const [productos, setProductos] = useState<Producto[]>([]);
-  const [ventas, setVentas] = useState<Venta[]>([]);
-  const [movimientos, setMovimientos] = useState<MovimientoCaja[]>([]);
-
-  const [nombreCliente, setNombreCliente] = useState("");
-  const [telefonoCliente, setTelefonoCliente] = useState("");
-  const [deudaCliente, setDeudaCliente] = useState("");
-
-  const [nombreProveedor, setNombreProveedor] = useState("");
-  const [telefonoProveedor, setTelefonoProveedor] = useState("");
-  const [empresaProveedor, setEmpresaProveedor] = useState("");
-
-  const [nombreProducto, setNombreProducto] = useState("");
-  const [categoriaProducto, setCategoriaProducto] = useState("");
-  const [precioCompra, setPrecioCompra] = useState("");
-  const [precioVenta, setPrecioVenta] = useState("");
-  const [stockProducto, setStockProducto] = useState("");
-
-  const [productoVenta, setProductoVenta] = useState("");
-  const [cantidadVenta, setCantidadVenta] = useState("1");
-
-  const [tipoMovimiento, setTipoMovimiento] = useState<"Ingreso" | "Gasto">("Ingreso");
-  const [descripcionMovimiento, setDescripcionMovimiento] = useState("");
-  const [montoMovimiento, setMontoMovimiento] = useState("");
-
-  useEffect(() => {
-    const clientesGuardados = localStorage.getItem("negocio_clientes");
-    const proveedoresGuardados = localStorage.getItem("negocio_proveedores");
-    const movimientosGuardados = localStorage.getItem("negocio_movimientos");
-
-    if (clientesGuardados) setClientes(JSON.parse(clientesGuardados));
-    if (proveedoresGuardados) setProveedores(JSON.parse(proveedoresGuardados));
-    if (movimientosGuardados) setMovimientos(JSON.parse(movimientosGuardados));
-
-    const productosGuardados = localStorage.getItem("negocio_productos");
-    const ventasGuardadas = localStorage.getItem("negocio_ventas");
-
-    if (productosGuardados) setProductos(JSON.parse(productosGuardados));
-    if (ventasGuardadas) setVentas(JSON.parse(ventasGuardadas));
-  }, []);
-
-  useEffect(() => {
-    localStorage.setItem("negocio_clientes", JSON.stringify(clientes));
-  }, [clientes]);
-
-  useEffect(() => {
-    localStorage.setItem("negocio_proveedores", JSON.stringify(proveedores));
-  }, [proveedores]);
-
-  useEffect(() => {
-    localStorage.setItem("negocio_movimientos", JSON.stringify(movimientos));
-  }, [movimientos]);
-
-  useEffect(() => {
-    localStorage.setItem("negocio_productos", JSON.stringify(productos));
-  }, [productos]);
-
-  useEffect(() => {
-    localStorage.setItem("negocio_ventas", JSON.stringify(ventas));
-  }, [ventas]);
-
-  function agregarCliente() {
-    if (!nombreCliente) return;
-
-    const nuevoCliente: Cliente = {
-      id: Date.now(),
-      nombre: nombreCliente,
-      telefono: telefonoCliente,
-      deuda: Number(deudaCliente) || 0,
-    };
-
-    setClientes([nuevoCliente, ...clientes]);
-
-    setNombreCliente("");
-    setTelefonoCliente("");
-    setDeudaCliente("");
-  }
-
-  function agregarProveedor() {
-    if (!nombreProveedor) return;
-
-    const nuevoProveedor: Proveedor = {
-      id: Date.now(),
-      nombre: nombreProveedor,
-      telefono: telefonoProveedor,
-      empresa: empresaProveedor,
-    };
-
-    setProveedores([nuevoProveedor, ...proveedores]);
-
-    setNombreProveedor("");
-    setTelefonoProveedor("");
-    setEmpresaProveedor("");
-  }
-
-  function agregarMovimiento() {
-    if (!descripcionMovimiento || !montoMovimiento) return;
-
-    const nuevoMovimiento: MovimientoCaja = {
-      id: Date.now(),
-      tipo: tipoMovimiento,
-      descripcion: descripcionMovimiento,
-      monto: Number(montoMovimiento),
-      fecha: new Date().toLocaleDateString("es-AR"),
-    };
-
-    setMovimientos([nuevoMovimiento, ...movimientos]);
-
-    setDescripcionMovimiento("");
-    setMontoMovimiento("");
-  }
-
-  function eliminarCliente(id: number) {
-    setClientes(clientes.filter((c) => c.id !== id));
-  }
-
-  function eliminarProveedor(id: number) {
-    setProveedores(proveedores.filter((p) => p.id !== id));
-  }
-
-  function agregarProducto() {
-    if (!nombreProducto || !precioVenta) return;
-
-    const nuevoProducto: Producto = {
-      id: Date.now(),
-      nombre: nombreProducto,
-      categoria: categoriaProducto,
-      precioCompra: Number(precioCompra),
-      precioVenta: Number(precioVenta),
-      stock: Number(stockProducto),
-    };
-
-    setProductos([nuevoProducto, ...productos]);
-
-    setNombreProducto("");
-    setCategoriaProducto("");
-    setPrecioCompra("");
-    setPrecioVenta("");
-    setStockProducto("");
-  }
-
-  function eliminarProducto(id: number) {
-    setProductos(productos.filter((p) => p.id !== id));
-  }
-
-  function registrarVenta() {
-    const producto = productos.find((p) => p.nombre === productoVenta);
-
-    if (!producto) return;
-
-    const cantidad = Number(cantidadVenta);
-
-    if (producto.stock < cantidad) {
-      alert("Stock insuficiente");
-      return;
-    }
-
-    const total = producto.precioVenta * cantidad;
-
-    const ganancia =
-      (producto.precioVenta - producto.precioCompra) * cantidad;
-
-    const nuevaVenta: Venta = {
-      id: Date.now(),
-      producto: producto.nombre,
-      cantidad,
-      total,
-      ganancia,
-      fecha: new Date().toLocaleDateString("es-AR"),
-    };
-
-    setVentas([nuevaVenta, ...ventas]);
-
-    setProductos(
-      productos.map((p) =>
-        p.id === producto.id
-          ? {
-              ...p,
-              stock: p.stock - cantidad,
-            }
-          : p
-      )
-    );
-
-    setProductoVenta("");
-    setCantidadVenta("1");
-  }
-
-  function eliminarMovimiento(id: number) {
-    setMovimientos(movimientos.filter((m) => m.id !== id));
-  }
-
-  const totalFiado = useMemo(() => {
-    return clientes.reduce((acc, cliente) => acc + cliente.deuda, 0);
-  }, [clientes]);
-
-  const ingresos = useMemo(() => {
-    return movimientos
-      .filter((m) => m.tipo === "Ingreso")
-      .reduce((acc, m) => acc + m.monto, 0);
-  }, [movimientos]);
-
-  const gastos = useMemo(() => {
-    return movimientos
-      .filter((m) => m.tipo === "Gasto")
-      .reduce((acc, m) => acc + m.monto, 0);
-  }, [movimientos]);
-
-  const caja = ingresos - gastos;
-
-  const gananciasTotales = ventas.reduce(
-    (acc, venta) => acc + venta.ganancia,
-    0
-  );
-
-  function mensajeWhatsApp(cliente: Cliente) {
-    const texto = `Hola ${cliente.nombre}, te recordamos que tenés un saldo pendiente de $${cliente.deuda.toLocaleString(
-      "es-AR"
-    )}. Gracias.`;
-
-    const url = `https://wa.me/54${cliente.telefono.replace(/\D/g, "")}?text=${encodeURIComponent(
-      texto
-    )}`;
-
-    window.open(url, "_blank");
-  }
+export default function NegocioFacilPOS() {
+  const productos = [
+    {
+      id: 1,
+      nombre: "Coca Cola 2.25L",
+      precio: 3500,
+      stock: 12,
+      categoria: "Bebidas",
+    },
+    {
+      id: 2,
+      nombre: "Pan Lactal",
+      precio: 2800,
+      stock: 5,
+      categoria: "Panificados",
+    },
+    {
+      id: 3,
+      nombre: "Yerba 1KG",
+      precio: 7200,
+      stock: 3,
+      categoria: "Almacén",
+    },
+    {
+      id: 4,
+      nombre: "Galletitas Oreo",
+      precio: 1900,
+      stock: 20,
+      categoria: "Snacks",
+    },
+  ];
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-100 via-white to-indigo-100 pb-28">
-      <header className="bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-500 text-white p-6 rounded-b-3xl shadow-2xl sticky top-0 z-50">
-        <h1 className="text-2xl font-bold">negocio-facil</h1>
-        <p className="text-sm text-gray-300 mt-1">
-          Gestión moderna para comercios argentinos
-        </p>
-      </header>
+    <div className="min-h-screen bg-gradient-to-br from-slate-100 via-white to-indigo-100 p-4">
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 h-full">
+        {/* PANEL PRODUCTOS */}
 
-      <main className="p-4 space-y-5">
-        {pantalla === "inicio" && (
-          <>
-            <div className="grid grid-cols-2 gap-3">
-              <div className="bg-white/90 backdrop-blur rounded-3xl p-5 shadow-xl border border-white/40">
-                <p className="text-sm text-gray-500">Clientes</p>
-                <h2 className="text-2xl font-bold mt-1">
-                  {clientes.length}
-                </h2>
-              </div>
+        <div className="lg:col-span-2 bg-white/90 backdrop-blur rounded-3xl shadow-2xl p-5 border border-white/40">
+          <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-3 mb-6">
+            <div>
+              <h1 className="text-4xl font-black text-slate-800">
+                NEGOCIO-FÁCIL
+              </h1>
 
-              <div className="bg-white/90 backdrop-blur rounded-3xl p-5 shadow-xl border border-white/40">
-                <p className="text-sm text-gray-500">Fiado total</p>
-                <h2 className="text-xl font-bold mt-1 text-red-600">
-                  ${totalFiado.toLocaleString("es-AR")}
-                </h2>
-              </div>
-
-              <div className="bg-white/90 backdrop-blur rounded-3xl p-5 shadow-xl border border-white/40">
-                <p className="text-sm text-gray-500">Caja diaria</p>
-                <h2 className="text-xl font-bold mt-1 text-green-600">
-                  ${caja.toLocaleString("es-AR")}
-                </h2>
-              </div>
-
-              <div className="bg-white/90 backdrop-blur rounded-3xl p-5 shadow-xl border border-white/40">
-                <p className="text-sm text-gray-500">Proveedores</p>
-                <h2 className="text-2xl font-bold mt-1">
-                  {proveedores.length}
-                </h2>
-              </div>
-            </div>
-
-            <div className="bg-white/90 backdrop-blur rounded-3xl p-5 shadow-xl border border-white/40">
-              <h2 className="text-xl font-bold mb-3">
-                Estado del negocio
-              </h2>
-
-              <div className="space-y-3 text-sm">
-                <div className="flex justify-between">
-                  <span>Total ingresos</span>
-                  <strong className="text-green-600">
-                    ${ingresos.toLocaleString("es-AR")}
-                  </strong>
-                </div>
-
-                <div className="flex justify-between">
-                  <span>Total gastos</span>
-                  <strong className="text-red-600">
-                    ${gastos.toLocaleString("es-AR")}
-                  </strong>
-                </div>
-
-                <div className="flex justify-between border-t pt-3 text-base">
-                  <span>Resultado</span>
-                  <strong>
-                    ${caja.toLocaleString("es-AR")}
-                  </strong>
-                </div>
-              </div>
-            </div>
-          </>
-        )}
-
-        {pantalla === "clientes" && (
-          <>
-            <div className="bg-white rounded-3xl p-5 shadow-lg space-y-3">
-              <h2 className="text-xl font-bold">Nuevo cliente</h2>
-
-              <input
-                className="w-full border rounded-2xl p-3"
-                placeholder="Nombre"
-                value={nombreCliente}
-                onChange={(e) => setNombreCliente(e.target.value)}
-              />
-
-              <input
-                className="w-full border rounded-2xl p-3"
-                placeholder="Teléfono"
-                value={telefonoCliente}
-                onChange={(e) => setTelefonoCliente(e.target.value)}
-              />
-
-              <input
-                className="w-full border rounded-2xl p-3"
-                placeholder="Deuda / Fiado"
-                type="number"
-                value={deudaCliente}
-                onChange={(e) => setDeudaCliente(e.target.value)}
-              />
-
-              <button
-                onClick={agregarCliente}
-                className="w-full bg-gradient-to-r from-indigo-600 to-purple-600 text-white p-4 rounded-2xl font-bold shadow-xl active:scale-95 transition-all"
-              >
-                Guardar cliente
-              </button>
-            </div>
-
-            <div className="space-y-3">
-              {clientes.map((cliente) => (
-                <div
-                  key={cliente.id}
-                  className="bg-white/90 backdrop-blur rounded-3xl p-5 shadow-xl border border-white/40"
-                >
-                  <div className="flex justify-between items-start">
-                    <div>
-                      <h3 className="text-lg font-bold">
-                        {cliente.nombre}
-                      </h3>
-
-                      <p className="text-gray-500 text-sm mt-1">
-                        📞 {cliente.telefono || "Sin teléfono"}
-                      </p>
-                    </div>
-
-                    <button
-                      onClick={() => eliminarCliente(cliente.id)}
-                      className="text-red-500 text-sm"
-                    >
-                      Eliminar
-                    </button>
-                  </div>
-
-                  <div className="mt-4 flex items-center justify-between">
-                    <p className="text-red-600 font-bold text-lg">
-                      💰 ${cliente.deuda.toLocaleString("es-AR")}
-                    </p>
-
-                    {cliente.telefono && (
-                      <button
-                        onClick={() => mensajeWhatsApp(cliente)}
-                        className="bg-green-500 text-white px-4 py-2 rounded-xl text-sm"
-                      >
-                        WhatsApp
-                      </button>
-                    )}
-                  </div>
-                </div>
-              ))}
-            </div>
-          </>
-        )}
-
-        {pantalla === "caja" && (
-          <>
-            <div className="bg-white rounded-3xl p-5 shadow-lg space-y-3">
-              <h2 className="text-xl font-bold">Caja diaria</h2>
-
-              <select
-                className="w-full border rounded-2xl p-3"
-                value={tipoMovimiento}
-                onChange={(e) =>
-                  setTipoMovimiento(e.target.value as "Ingreso" | "Gasto")
-                }
-              >
-                <option value="Ingreso">Ingreso</option>
-                <option value="Gasto">Gasto</option>
-              </select>
-
-              <input
-                className="w-full border rounded-2xl p-3"
-                placeholder="Descripción"
-                value={descripcionMovimiento}
-                onChange={(e) => setDescripcionMovimiento(e.target.value)}
-              />
-
-              <input
-                className="w-full border rounded-2xl p-3"
-                placeholder="Monto"
-                type="number"
-                value={montoMovimiento}
-                onChange={(e) => setMontoMovimiento(e.target.value)}
-              />
-
-              <button
-                onClick={agregarMovimiento}
-                className="w-full bg-gradient-to-r from-indigo-600 to-purple-600 text-white p-4 rounded-2xl font-bold shadow-xl active:scale-95 transition-all"
-              >
-                Guardar movimiento
-              </button>
-            </div>
-
-            <div className="space-y-3">
-              {movimientos.map((movimiento) => (
-                <div
-                  key={movimiento.id}
-                  className="bg-white/90 backdrop-blur rounded-3xl p-5 shadow-xl border border-white/40"
-                >
-                  <div className="flex justify-between items-center">
-                    <div>
-                      <h3 className="font-bold text-lg">
-                        {movimiento.descripcion}
-                      </h3>
-
-                      <p className="text-sm text-gray-500 mt-1">
-                        {movimiento.fecha}
-                      </p>
-                    </div>
-
-                    <button
-                      onClick={() => eliminarMovimiento(movimiento.id)}
-                      className="text-red-500 text-sm"
-                    >
-                      Eliminar
-                    </button>
-                  </div>
-
-                  <p
-                    className={`mt-3 text-lg font-bold ${
-                      movimiento.tipo === "Ingreso"
-                        ? "text-green-600"
-                        : "text-red-600"
-                    }`}
-                  >
-                    {movimiento.tipo === "Ingreso" ? "+" : "-"}$
-                    {movimiento.monto.toLocaleString("es-AR")}
-                  </p>
-                </div>
-              ))}
-            </div>
-          </>
-        )}
-
-        {pantalla === "productos" && (
-          <>
-            <div className="bg-white/90 backdrop-blur rounded-3xl p-5 shadow-xl border border-white/40 space-y-3">
-              <h2 className="text-2xl font-bold">Productos</h2>
-
-              <input className="w-full border rounded-2xl p-3" placeholder="Nombre producto" value={nombreProducto} onChange={(e) => setNombreProducto(e.target.value)} />
-
-              <input className="w-full border rounded-2xl p-3" placeholder="Categoría" value={categoriaProducto} onChange={(e) => setCategoriaProducto(e.target.value)} />
-
-              <input className="w-full border rounded-2xl p-3" placeholder="Precio compra" type="number" value={precioCompra} onChange={(e) => setPrecioCompra(e.target.value)} />
-
-              <input className="w-full border rounded-2xl p-3" placeholder="Precio venta" type="number" value={precioVenta} onChange={(e) => setPrecioVenta(e.target.value)} />
-
-              <input className="w-full border rounded-2xl p-3" placeholder="Stock" type="number" value={stockProducto} onChange={(e) => setStockProducto(e.target.value)} />
-
-              <button onClick={agregarProducto} className="w-full bg-gradient-to-r from-indigo-600 to-purple-600 text-white p-4 rounded-2xl font-bold shadow-xl">
-                Guardar producto
-              </button>
-            </div>
-          </>
-        )}
-
-        {pantalla === "ventas" && (
-          <>
-            <div className="bg-white/90 backdrop-blur rounded-3xl p-5 shadow-xl border border-white/40 space-y-3">
-              <h2 className="text-2xl font-bold">Nueva venta</h2>
-
-              <select className="w-full border rounded-2xl p-3" value={productoVenta} onChange={(e) => setProductoVenta(e.target.value)}>
-                <option value="">Seleccionar producto</option>
-                {productos.map((producto) => (
-                  <option key={producto.id} value={producto.nombre}>
-                    {producto.nombre}
-                  </option>
-                ))}
-              </select>
-
-              <input className="w-full border rounded-2xl p-3" placeholder="Cantidad" type="number" value={cantidadVenta} onChange={(e) => setCantidadVenta(e.target.value)} />
-
-              <button onClick={registrarVenta} className="w-full bg-gradient-to-r from-green-500 to-emerald-600 text-white p-4 rounded-2xl font-bold shadow-xl">
-                Registrar venta
-              </button>
-            </div>
-
-            <div className="bg-white/90 backdrop-blur rounded-3xl p-5 shadow-xl border border-white/40 mt-4">
-              <h3 className="text-xl font-bold">Ganancias</h3>
-              <p className="text-3xl font-bold text-green-600 mt-3">
-                ${gananciasTotales.toLocaleString("es-AR")}
+              <p className="text-gray-500 mt-1">
+                Caja rápida para almacenes
               </p>
             </div>
-          </>
-        )}
 
-        {pantalla === "proveedores" && (
-          <>
-            <div className="bg-white rounded-3xl p-5 shadow-lg space-y-3">
-              <h2 className="text-xl font-bold">Nuevo proveedor</h2>
+            <input
+              placeholder="Buscar producto..."
+              className="w-full md:w-96 p-4 rounded-2xl border border-gray-200 shadow-sm text-lg"
+            />
+          </div>
 
-              <input
-                className="w-full border rounded-2xl p-3"
-                placeholder="Nombre"
-                value={nombreProveedor}
-                onChange={(e) => setNombreProveedor(e.target.value)}
-              />
+          {/* CATEGORÍAS */}
 
-              <input
-                className="w-full border rounded-2xl p-3"
-                placeholder="Empresa"
-                value={empresaProveedor}
-                onChange={(e) => setEmpresaProveedor(e.target.value)}
-              />
-
-              <input
-                className="w-full border rounded-2xl p-3"
-                placeholder="Teléfono"
-                value={telefonoProveedor}
-                onChange={(e) => setTelefonoProveedor(e.target.value)}
-              />
-
+          <div className="flex gap-3 overflow-auto pb-2 mb-6">
+            {[
+              "Todos",
+              "Bebidas",
+              "Almacén",
+              "Snacks",
+              "Panificados",
+            ].map((cat) => (
               <button
-                onClick={agregarProveedor}
-                className="w-full bg-gradient-to-r from-indigo-600 to-purple-600 text-white p-4 rounded-2xl font-bold shadow-xl active:scale-95 transition-all"
+                key={cat}
+                className="bg-gradient-to-r from-indigo-600 to-purple-600 text-white px-5 py-3 rounded-2xl font-bold whitespace-nowrap shadow-lg active:scale-95 transition-all"
               >
-                Guardar proveedor
+                {cat}
               </button>
-            </div>
+            ))}
+          </div>
 
-            <div className="space-y-3">
-              {proveedores.map((proveedor) => (
-                <div
-                  key={proveedor.id}
-                  className="bg-white/90 backdrop-blur rounded-3xl p-5 shadow-xl border border-white/40"
-                >
-                  <div className="flex justify-between items-start">
-                    <div>
-                      <h3 className="text-lg font-bold">
-                        {proveedor.nombre}
-                      </h3>
+          {/* PRODUCTOS */}
 
-                      <p className="text-gray-500 mt-1">
-                        🏢 {proveedor.empresa}
-                      </p>
+          <div className="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-4">
+            {productos.map((producto) => (
+              <button
+                key={producto.id}
+                className="bg-white rounded-3xl p-4 shadow-xl border border-gray-100 text-left active:scale-95 transition-all hover:shadow-2xl"
+              >
+                <div className="flex justify-between items-start">
+                  <span className="text-xs bg-indigo-100 text-indigo-700 px-3 py-1 rounded-full font-bold">
+                    {producto.categoria}
+                  </span>
 
-                      <p className="text-gray-500 mt-1">
-                        📞 {proveedor.telefono}
-                      </p>
-                    </div>
-
-                    <button
-                      onClick={() => eliminarProveedor(proveedor.id)}
-                      className="text-red-500 text-sm"
-                    >
-                      Eliminar
-                    </button>
-                  </div>
+                  <span
+                    className={`text-xs px-3 py-1 rounded-full font-bold text-white ${
+                      producto.stock <= 3
+                        ? "bg-red-500"
+                        : producto.stock <= 6
+                        ? "bg-yellow-500"
+                        : "bg-green-500"
+                    }`}
+                  >
+                    {producto.stock}
+                  </span>
                 </div>
-              ))}
+
+                <div className="mt-6">
+                  <h3 className="font-bold text-lg text-slate-800 leading-tight">
+                    {producto.nombre}
+                  </h3>
+
+                  <p className="text-3xl font-black text-indigo-600 mt-3">
+                    ${producto.precio}
+                  </p>
+                </div>
+              </button>
+            ))}
+          </div>
+        </div>
+
+        {/* PANEL TICKET */}
+
+        <div className="bg-slate-900 text-white rounded-3xl shadow-2xl p-5 flex flex-col">
+          <div className="flex justify-between items-center mb-6">
+            <div>
+              <h2 className="text-3xl font-black">
+                Ticket
+              </h2>
+
+              <p className="text-slate-400 text-sm mt-1">
+                Venta rápida
+              </p>
             </div>
-          </>
-        )}
-      </main>
 
-      <nav className="fixed bottom-3 left-3 right-3 bg-white/90 backdrop-blur rounded-3xl shadow-2xl flex justify-around p-4 border border-gray-200">
-        <button
-          onClick={() => setPantalla("inicio")}
-          className="text-sm font-semibold"
-        >
-          Inicio
-        </button>
+            <div className="bg-emerald-500 px-4 py-2 rounded-2xl font-bold shadow-lg">
+              Caja abierta
+            </div>
+          </div>
 
-        <button
-          onClick={() => setPantalla("clientes")}
-          className="text-sm font-semibold"
-        >
-          Clientes
-        </button>
+          {/* PRODUCTOS TICKET */}
 
-        <button
-          onClick={() => setPantalla("caja")}
-          className="text-sm font-semibold"
-        >
-          Caja
-        </button>
+          <div className="space-y-3 flex-1 overflow-auto">
+            <div className="bg-slate-800 rounded-2xl p-4 flex justify-between items-center">
+              <div>
+                <h3 className="font-bold">
+                  Coca Cola 2.25L
+                </h3>
 
-        <button
-          onClick={() => setPantalla("productos")}
-          className="text-sm font-semibold"
-        >
-          Productos
-        </button>
+                <p className="text-sm text-slate-400">
+                  x2
+                </p>
+              </div>
 
-        <button
-          onClick={() => setPantalla("ventas")}
-          className="text-sm font-semibold"
-        >
-          Ventas
-        </button>
+              <div className="text-right">
+                <p className="font-black text-xl">
+                  $7000
+                </p>
+              </div>
+            </div>
 
-        <button
-          onClick={() => setPantalla("proveedores")}
-          className="text-sm font-semibold"
-        >
-          Proveedores
-        </button>
-      </nav>
+            <div className="bg-slate-800 rounded-2xl p-4 flex justify-between items-center">
+              <div>
+                <h3 className="font-bold">
+                  Pan Lactal
+                </h3>
+
+                <p className="text-sm text-slate-400">
+                  x1
+                </p>
+              </div>
+
+              <div className="text-right">
+                <p className="font-black text-xl">
+                  $2800
+                </p>
+              </div>
+            </div>
+          </div>
+
+          {/* TOTAL */}
+
+          <div className="mt-6 bg-slate-800 rounded-3xl p-5 shadow-inner">
+            <div className="flex justify-between items-center">
+              <span className="text-slate-400 text-lg">
+                TOTAL
+              </span>
+
+              <span className="text-5xl font-black text-emerald-400">
+                $9800
+              </span>
+            </div>
+          </div>
+
+          {/* BOTONES */}
+
+          <div className="grid grid-cols-2 gap-3 mt-6">
+            <button className="bg-emerald-500 p-5 rounded-3xl text-xl font-black shadow-xl active:scale-95 transition-all">
+              Efectivo
+            </button>
+
+            <button className="bg-indigo-500 p-5 rounded-3xl text-xl font-black shadow-xl active:scale-95 transition-all">
+              Transferencia
+            </button>
+
+            <button className="bg-yellow-500 text-black p-5 rounded-3xl text-xl font-black shadow-xl active:scale-95 transition-all">
+              Fiado
+            </button>
+
+            <button className="bg-pink-500 p-5 rounded-3xl text-xl font-black shadow-xl active:scale-95 transition-all">
+              WhatsApp
+            </button>
+          </div>
+        </div>
+      </div>
     </div>
   );
 }
-
-export default App;
