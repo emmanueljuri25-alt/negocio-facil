@@ -15,6 +15,24 @@ type MovimientoCaja = {
   fecha: string;
 };
 
+type Producto = {
+  id: number;
+  nombre: string;
+  categoria: string;
+  precioCompra: number;
+  precioVenta: number;
+  stock: number;
+};
+
+type Venta = {
+  id: number;
+  producto: string;
+  cantidad: number;
+  total: number;
+  ganancia: number;
+  fecha: string;
+};
+
 type Proveedor = {
   id: number;
   nombre: string;
@@ -27,6 +45,8 @@ function App() {
 
   const [clientes, setClientes] = useState<Cliente[]>([]);
   const [proveedores, setProveedores] = useState<Proveedor[]>([]);
+  const [productos, setProductos] = useState<Producto[]>([]);
+  const [ventas, setVentas] = useState<Venta[]>([]);
   const [movimientos, setMovimientos] = useState<MovimientoCaja[]>([]);
 
   const [nombreCliente, setNombreCliente] = useState("");
@@ -36,6 +56,15 @@ function App() {
   const [nombreProveedor, setNombreProveedor] = useState("");
   const [telefonoProveedor, setTelefonoProveedor] = useState("");
   const [empresaProveedor, setEmpresaProveedor] = useState("");
+
+  const [nombreProducto, setNombreProducto] = useState("");
+  const [categoriaProducto, setCategoriaProducto] = useState("");
+  const [precioCompra, setPrecioCompra] = useState("");
+  const [precioVenta, setPrecioVenta] = useState("");
+  const [stockProducto, setStockProducto] = useState("");
+
+  const [productoVenta, setProductoVenta] = useState("");
+  const [cantidadVenta, setCantidadVenta] = useState("1");
 
   const [tipoMovimiento, setTipoMovimiento] = useState<"Ingreso" | "Gasto">("Ingreso");
   const [descripcionMovimiento, setDescripcionMovimiento] = useState("");
@@ -49,6 +78,12 @@ function App() {
     if (clientesGuardados) setClientes(JSON.parse(clientesGuardados));
     if (proveedoresGuardados) setProveedores(JSON.parse(proveedoresGuardados));
     if (movimientosGuardados) setMovimientos(JSON.parse(movimientosGuardados));
+
+    const productosGuardados = localStorage.getItem("negocio_productos");
+    const ventasGuardadas = localStorage.getItem("negocio_ventas");
+
+    if (productosGuardados) setProductos(JSON.parse(productosGuardados));
+    if (ventasGuardadas) setVentas(JSON.parse(ventasGuardadas));
   }, []);
 
   useEffect(() => {
@@ -62,6 +97,14 @@ function App() {
   useEffect(() => {
     localStorage.setItem("negocio_movimientos", JSON.stringify(movimientos));
   }, [movimientos]);
+
+  useEffect(() => {
+    localStorage.setItem("negocio_productos", JSON.stringify(productos));
+  }, [productos]);
+
+  useEffect(() => {
+    localStorage.setItem("negocio_ventas", JSON.stringify(ventas));
+  }, [ventas]);
 
   function agregarCliente() {
     if (!nombreCliente) return;
@@ -122,6 +165,74 @@ function App() {
     setProveedores(proveedores.filter((p) => p.id !== id));
   }
 
+  function agregarProducto() {
+    if (!nombreProducto || !precioVenta) return;
+
+    const nuevoProducto: Producto = {
+      id: Date.now(),
+      nombre: nombreProducto,
+      categoria: categoriaProducto,
+      precioCompra: Number(precioCompra),
+      precioVenta: Number(precioVenta),
+      stock: Number(stockProducto),
+    };
+
+    setProductos([nuevoProducto, ...productos]);
+
+    setNombreProducto("");
+    setCategoriaProducto("");
+    setPrecioCompra("");
+    setPrecioVenta("");
+    setStockProducto("");
+  }
+
+  function eliminarProducto(id: number) {
+    setProductos(productos.filter((p) => p.id !== id));
+  }
+
+  function registrarVenta() {
+    const producto = productos.find((p) => p.nombre === productoVenta);
+
+    if (!producto) return;
+
+    const cantidad = Number(cantidadVenta);
+
+    if (producto.stock < cantidad) {
+      alert("Stock insuficiente");
+      return;
+    }
+
+    const total = producto.precioVenta * cantidad;
+
+    const ganancia =
+      (producto.precioVenta - producto.precioCompra) * cantidad;
+
+    const nuevaVenta: Venta = {
+      id: Date.now(),
+      producto: producto.nombre,
+      cantidad,
+      total,
+      ganancia,
+      fecha: new Date().toLocaleDateString("es-AR"),
+    };
+
+    setVentas([nuevaVenta, ...ventas]);
+
+    setProductos(
+      productos.map((p) =>
+        p.id === producto.id
+          ? {
+              ...p,
+              stock: p.stock - cantidad,
+            }
+          : p
+      )
+    );
+
+    setProductoVenta("");
+    setCantidadVenta("1");
+  }
+
   function eliminarMovimiento(id: number) {
     setMovimientos(movimientos.filter((m) => m.id !== id));
   }
@@ -143,6 +254,11 @@ function App() {
   }, [movimientos]);
 
   const caja = ingresos - gastos;
+
+  const gananciasTotales = ventas.reduce(
+    (acc, venta) => acc + venta.ganancia,
+    0
+  );
 
   function mensajeWhatsApp(cliente: Cliente) {
     const texto = `Hola ${cliente.nombre}, te recordamos que tenés un saldo pendiente de $${cliente.deuda.toLocaleString(
@@ -389,6 +505,58 @@ function App() {
           </>
         )}
 
+        {pantalla === "productos" && (
+          <>
+            <div className="bg-white/90 backdrop-blur rounded-3xl p-5 shadow-xl border border-white/40 space-y-3">
+              <h2 className="text-2xl font-bold">Productos</h2>
+
+              <input className="w-full border rounded-2xl p-3" placeholder="Nombre producto" value={nombreProducto} onChange={(e) => setNombreProducto(e.target.value)} />
+
+              <input className="w-full border rounded-2xl p-3" placeholder="Categoría" value={categoriaProducto} onChange={(e) => setCategoriaProducto(e.target.value)} />
+
+              <input className="w-full border rounded-2xl p-3" placeholder="Precio compra" type="number" value={precioCompra} onChange={(e) => setPrecioCompra(e.target.value)} />
+
+              <input className="w-full border rounded-2xl p-3" placeholder="Precio venta" type="number" value={precioVenta} onChange={(e) => setPrecioVenta(e.target.value)} />
+
+              <input className="w-full border rounded-2xl p-3" placeholder="Stock" type="number" value={stockProducto} onChange={(e) => setStockProducto(e.target.value)} />
+
+              <button onClick={agregarProducto} className="w-full bg-gradient-to-r from-indigo-600 to-purple-600 text-white p-4 rounded-2xl font-bold shadow-xl">
+                Guardar producto
+              </button>
+            </div>
+          </>
+        )}
+
+        {pantalla === "ventas" && (
+          <>
+            <div className="bg-white/90 backdrop-blur rounded-3xl p-5 shadow-xl border border-white/40 space-y-3">
+              <h2 className="text-2xl font-bold">Nueva venta</h2>
+
+              <select className="w-full border rounded-2xl p-3" value={productoVenta} onChange={(e) => setProductoVenta(e.target.value)}>
+                <option value="">Seleccionar producto</option>
+                {productos.map((producto) => (
+                  <option key={producto.id} value={producto.nombre}>
+                    {producto.nombre}
+                  </option>
+                ))}
+              </select>
+
+              <input className="w-full border rounded-2xl p-3" placeholder="Cantidad" type="number" value={cantidadVenta} onChange={(e) => setCantidadVenta(e.target.value)} />
+
+              <button onClick={registrarVenta} className="w-full bg-gradient-to-r from-green-500 to-emerald-600 text-white p-4 rounded-2xl font-bold shadow-xl">
+                Registrar venta
+              </button>
+            </div>
+
+            <div className="bg-white/90 backdrop-blur rounded-3xl p-5 shadow-xl border border-white/40 mt-4">
+              <h3 className="text-xl font-bold">Ganancias</h3>
+              <p className="text-3xl font-bold text-green-600 mt-3">
+                ${gananciasTotales.toLocaleString("es-AR")}
+              </p>
+            </div>
+          </>
+        )}
+
         {pantalla === "proveedores" && (
           <>
             <div className="bg-white rounded-3xl p-5 shadow-lg space-y-3">
@@ -478,6 +646,20 @@ function App() {
           className="text-sm font-semibold"
         >
           Caja
+        </button>
+
+        <button
+          onClick={() => setPantalla("productos")}
+          className="text-sm font-semibold"
+        >
+          Productos
+        </button>
+
+        <button
+          onClick={() => setPantalla("ventas")}
+          className="text-sm font-semibold"
+        >
+          Ventas
         </button>
 
         <button
