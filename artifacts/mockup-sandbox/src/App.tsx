@@ -17,11 +17,24 @@ type Venta = {
 
 export default function NegocioFacilPOS() {
 
-  // ===============================
+  // ======================================================
   // STATES
-  // ===============================
+  // ======================================================
 
-  const [vista, setVista] = useState<"caja" | "stock">("caja");
+  const [vista, setVista] = useState<
+    "caja" |
+    "stock" |
+    "fiado" |
+    "consignacion"
+  >("caja");
+
+  const [ticket, setTicket] = useState<any[]>([]);
+
+  const [ventas, setVentas] = useState<Venta[]>([]);
+
+  const [clientesFiado, setClientesFiado] = useState<any[]>([]);
+
+  const [consignaciones, setConsignaciones] = useState<any[]>([]);
 
   const [telefonoCliente, setTelefonoCliente] = useState("");
 
@@ -30,11 +43,12 @@ export default function NegocioFacilPOS() {
   const [mostrarAgregar, setMostrarAgregar] = useState(false);
 
   const [nuevoNombre, setNuevoNombre] = useState("");
-  const [nuevoPrecio, setNuevoPrecio] = useState("");
-  const [nuevoStock, setNuevoStock] = useState("");
-  const [nuevoCategoria, setNuevoCategoria] = useState("");
 
-  const [ventas, setVentas] = useState<Venta[]>([]);
+  const [nuevoPrecio, setNuevoPrecio] = useState("");
+
+  const [nuevoStock, setNuevoStock] = useState("");
+
+  const [nuevoCategoria, setNuevoCategoria] = useState("");
 
   const [productos, setProductos] = useState<Producto[]>([
     {
@@ -48,21 +62,21 @@ export default function NegocioFacilPOS() {
       id: 2,
       nombre: "Pan Lactal",
       precio: 2800,
-      stock: 5,
+      stock: 8,
       categoria: "Panificados",
     },
     {
       id: 3,
       nombre: "Yerba 1KG",
       precio: 7200,
-      stock: 3,
+      stock: 4,
       categoria: "Almacén",
     },
   ]);
 
-  // ===============================
+  // ======================================================
   // STORAGE
-  // ===============================
+  // ======================================================
 
   useEffect(() => {
 
@@ -72,12 +86,28 @@ export default function NegocioFacilPOS() {
     const ventasGuardadas =
       localStorage.getItem("ventas_pos");
 
+    const fiadosGuardados =
+      localStorage.getItem("fiados_pos");
+
+    const consignacionesGuardadas =
+      localStorage.getItem("consignaciones_pos");
+
     if (productosGuardados) {
       setProductos(JSON.parse(productosGuardados));
     }
 
     if (ventasGuardadas) {
       setVentas(JSON.parse(ventasGuardadas));
+    }
+
+    if (fiadosGuardados) {
+      setClientesFiado(JSON.parse(fiadosGuardados));
+    }
+
+    if (consignacionesGuardadas) {
+      setConsignaciones(
+        JSON.parse(consignacionesGuardadas)
+      );
     }
 
   }, []);
@@ -100,24 +130,46 @@ export default function NegocioFacilPOS() {
 
   }, [ventas]);
 
-  // ===============================
-  // TICKET
-  // ===============================
+  useEffect(() => {
 
-  const totalTicket = 9800;
+    localStorage.setItem(
+      "fiados_pos",
+      JSON.stringify(clientesFiado)
+    );
+
+  }, [clientesFiado]);
+
+  useEffect(() => {
+
+    localStorage.setItem(
+      "consignaciones_pos",
+      JSON.stringify(consignaciones)
+    );
+
+  }, [consignaciones]);
+
+  // ======================================================
+  // TOTAL
+  // ======================================================
+
+  const totalTicket = ticket.reduce(
+    (acc, item) =>
+      acc + item.precio * item.cantidad,
+    0
+  );
 
   const cambio =
     Number(montoRecibido || 0) - totalTicket;
 
-  // ===============================
-  // AGREGAR PRODUCTO
-  // ===============================
+  // ======================================================
+  // AGREGAR PRODUCTO STOCK
+  // ======================================================
 
   function agregarProducto() {
 
     if (!nuevoNombre || !nuevoPrecio) return;
 
-    const nuevoProductoData: Producto = {
+    const nuevoProducto: Producto = {
       id: Date.now(),
       nombre: nuevoNombre,
       precio: Number(nuevoPrecio),
@@ -127,7 +179,7 @@ export default function NegocioFacilPOS() {
 
     setProductos([
       ...productos,
-      nuevoProductoData,
+      nuevoProducto,
     ]);
 
     setNuevoNombre("");
@@ -138,35 +190,127 @@ export default function NegocioFacilPOS() {
     setMostrarAgregar(false);
   }
 
-  // ===============================
-  // GUARDAR VENTA
-  // ===============================
+  // ======================================================
+  // AGREGAR PRODUCTO AL TICKET
+  // ======================================================
+
+  function agregarAlTicket(producto: Producto) {
+
+    const existe = ticket.find(
+      (t) => t.id === producto.id
+    );
+
+    if (existe) {
+
+      setTicket(
+        ticket.map((t) =>
+          t.id === producto.id
+            ? {
+                ...t,
+                cantidad:
+                  t.cantidad + 1,
+              }
+            : t
+        )
+      );
+
+    } else {
+
+      setTicket([
+        ...ticket,
+        {
+          ...producto,
+          cantidad: 1,
+        },
+      ]);
+
+    }
+
+  }
+
+  // ======================================================
+  // FINALIZAR VENTA
+  // ======================================================
 
   function finalizarVenta(metodo: string) {
 
-    const nuevaVenta: Venta = {
-      id: Date.now(),
-      fecha: new Date().toLocaleString(),
-      total: totalTicket,
-      metodo,
-    };
+    if (ticket.length === 0) {
+      alert("No hay productos");
+      return;
+    }
 
-    setVentas([nuevaVenta, ...ventas]);
+    // DESCONTAR STOCK
 
-    alert("Venta registrada");
+    const nuevosProductos = productos.map((p) => {
+
+      const vendido = ticket.find(
+        (t) => t.id === p.id
+      );
+
+      if (!vendido) return p;
+
+      return {
+        ...p,
+        stock: p.stock - vendido.cantidad,
+      };
+
+    });
+
+    setProductos(nuevosProductos);
+
+    // SI ES FIADO
+
+    if (metodo === "Fiado") {
+
+      const nombre =
+        prompt("Nombre cliente");
+
+      const whatsapp =
+        prompt("WhatsApp cliente");
+
+      const vencimiento =
+        prompt("Fecha vencimiento");
+
+      if (nombre) {
+
+        setClientesFiado([
+          {
+            nombre,
+            whatsapp,
+            vencimiento,
+            deuda: totalTicket,
+          },
+          ...clientesFiado,
+        ]);
+
+      }
+
+    } else {
+
+      const nuevaVenta: Venta = {
+        id: Date.now(),
+        fecha: new Date().toLocaleString(),
+        total: totalTicket,
+        metodo,
+      };
+
+      setVentas([
+        nuevaVenta,
+        ...ventas,
+      ]);
+
+    }
+
+    setTicket([]);
+
+    setMontoRecibido("");
+
+    alert("Venta finalizada");
   }
 
-  // ===============================
-  // TICKET WHATSAPP
-  // ===============================
-
-  const ticketTexto = `
-🧾 NEGOCIO-FÁCIL
-
-TOTAL: $${totalTicket}
-
-Gracias por su compra ❤️
-`;
+  // ======================================================
+  // WHATSAPP
+  // ======================================================
 
   function enviarWhatsApp() {
 
@@ -178,39 +322,56 @@ Gracias por su compra ❤️
     const numero =
       telefonoCliente.replace(/\D/g, "");
 
+    const detalleProductos = ticket
+      .map(
+        (item) =>
+          `${item.nombre} x${item.cantidad} - $${item.precio * item.cantidad}`
+      )
+      .join("\n");
+
+    const mensaje = `
+🧾 NEGOCIO-FÁCIL
+
+${detalleProductos}
+
+TOTAL: $${totalTicket}
+
+Gracias por su compra ❤️
+`;
+
     const url =
-      `https://wa.me/54${numero}?text=${encodeURIComponent(ticketTexto)}`;
+      `https://wa.me/54${numero}?text=${encodeURIComponent(mensaje)}`;
 
     window.open(url, "_blank");
   }
 
-  // ===============================
-  // IMPRIMIR
-  // ===============================
+  // ======================================================
+  // IMPRESIÓN
+  // ======================================================
 
   function imprimirTicket() {
     window.print();
   }
 
-  // ===============================
-  // CAJA DÍA
-  // ===============================
+  // ======================================================
+  // TOTAL CAJA
+  // ======================================================
 
   const totalCaja = ventas.reduce(
     (acc, venta) => acc + venta.total,
     0
   );
 
-  // ===============================
+  // ======================================================
   // QR
-  // ===============================
+  // ======================================================
 
   const qrUrl =
-    `https://api.qrserver.com/v1/create-qr-code/?size=220x220&data=TOTAL:${totalTicket}`;
+    `https://api.qrserver.com/v1/create-qr-code/?size=250x250&data=TOTAL:${totalTicket}`;
 
-  // ===============================
+  // ======================================================
   // UI
-  // ===============================
+  // ======================================================
 
   return (
 
@@ -218,7 +379,7 @@ Gracias por su compra ❤️
 
       {/* NAV */}
 
-      <div className="flex gap-3 mb-4">
+      <div className="flex flex-wrap gap-3 mb-4">
 
         <button
           onClick={() => setVista("caja")}
@@ -242,9 +403,33 @@ Gracias por su compra ❤️
           Stock
         </button>
 
+        <button
+          onClick={() => setVista("consignacion")}
+          className={`px-6 py-3 rounded-2xl font-bold shadow-lg ${
+            vista === "consignacion"
+              ? "bg-indigo-600 text-white"
+              : "bg-white"
+          }`}
+        >
+          Consignación
+        </button>
+
+        <button
+          onClick={() => setVista("fiado")}
+          className={`px-6 py-3 rounded-2xl font-bold shadow-lg ${
+            vista === "fiado"
+              ? "bg-indigo-600 text-white"
+              : "bg-white"
+          }`}
+        >
+          Fiados
+        </button>
+
       </div>
 
-      {/* CAJA */}
+      {/* ======================================================
+      CAJA
+      ====================================================== */}
 
       {vista === "caja" && (
 
@@ -257,6 +442,59 @@ Gracias por su compra ❤️
             <h2 className="text-4xl font-black">
               Ticket
             </h2>
+
+            {/* PRODUCTOS */}
+
+            <div className="space-y-3 mt-6 max-h-[400px] overflow-auto">
+
+              {ticket.length === 0 && (
+
+                <div className="bg-slate-800 rounded-3xl p-6 text-center">
+
+                  <p className="text-slate-400 text-xl">
+                    No hay productos
+                  </p>
+
+                </div>
+
+              )}
+
+              {ticket.map((item) => (
+
+                <div
+                  key={item.id}
+                  className="bg-slate-800 rounded-2xl p-4 flex justify-between items-center"
+                >
+
+                  <div>
+
+                    <h3 className="font-bold text-lg">
+                      {item.nombre}
+                    </h3>
+
+                    <p className="text-sm text-slate-400">
+                      x{item.cantidad}
+                    </p>
+
+                  </div>
+
+                  <div className="text-right">
+
+                    <p className="font-black text-2xl">
+                      $
+                      {item.precio *
+                        item.cantidad}
+                    </p>
+
+                  </div>
+
+                </div>
+
+              ))}
+
+            </div>
+
+            {/* TOTAL */}
 
             <div className="mt-6 bg-slate-800 rounded-3xl p-5">
 
@@ -386,7 +624,7 @@ Gracias por su compra ❤️
 
             </div>
 
-            {/* IMPRESIÓN */}
+            {/* IMPRIMIR */}
 
             <button
               onClick={imprimirTicket}
@@ -395,7 +633,7 @@ Gracias por su compra ❤️
               🖨 Imprimir Ticket
             </button>
 
-            {/* CAJA */}
+            {/* CAJA DEL DÍA */}
 
             <div className="mt-6 bg-slate-800 rounded-3xl p-5">
 
@@ -407,36 +645,13 @@ Gracias por su compra ❤️
                 ${totalCaja}
               </p>
 
-              <div className="mt-4 space-y-2">
-
-                {ventas.slice(0, 5).map((venta) => (
-
-                  <div
-                    key={venta.id}
-                    className="bg-slate-700 rounded-2xl p-3"
-                  >
-
-                    <p className="font-bold">
-                      ${venta.total}
-                    </p>
-
-                    <p className="text-sm text-slate-300">
-                      {venta.metodo}
-                    </p>
-
-                  </div>
-
-                ))}
-
-              </div>
-
             </div>
 
           </div>
 
           {/* PRODUCTOS */}
 
-          <div className="xl:col-span-2 xl:order-1 bg-white/90 backdrop-blur rounded-3xl shadow-2xl p-5">
+          <div className="xl:col-span-2 xl:order-1 bg-white rounded-3xl p-5 shadow-2xl">
 
             <div className="flex justify-between items-center mb-6">
 
@@ -454,18 +669,16 @@ Gracias por su compra ❤️
 
             </div>
 
-            <input
-              placeholder="Buscar producto..."
-              className="w-full p-5 rounded-3xl border text-xl font-bold mb-6"
-            />
-
             <div className="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-4">
 
               {productos.map((producto) => (
 
                 <button
                   key={producto.id}
-                  className="bg-white rounded-3xl p-4 shadow-xl border text-left"
+                  onClick={() =>
+                    agregarAlTicket(producto)
+                  }
+                  className="bg-white rounded-3xl p-4 shadow-xl border text-left hover:scale-105 transition-all"
                 >
 
                   <div className="flex justify-between">
@@ -512,7 +725,9 @@ Gracias por su compra ❤️
 
       )}
 
-      {/* STOCK */}
+      {/* ======================================================
+      STOCK
+      ====================================================== */}
 
       {vista === "stock" && (
 
@@ -578,7 +793,160 @@ Gracias por su compra ❤️
 
       )}
 
-      {/* MODAL */}
+      {/* ======================================================
+      FIADOS
+      ====================================================== */}
+
+      {vista === "fiado" && (
+
+        <div className="bg-white rounded-3xl p-6 shadow-2xl">
+
+          <h2 className="text-4xl font-black mb-6">
+            Clientes Fiado
+          </h2>
+
+          <div className="space-y-4">
+
+            {clientesFiado.map((cliente, i) => (
+
+              <div
+                key={i}
+                className="bg-slate-100 rounded-3xl p-5"
+              >
+
+                <div className="flex justify-between">
+
+                  <div>
+
+                    <h3 className="text-2xl font-black">
+                      {cliente.nombre}
+                    </h3>
+
+                    <p>
+                      {cliente.whatsapp}
+                    </p>
+
+                  </div>
+
+                  <div className="text-right">
+
+                    <p className="text-3xl font-black text-red-500">
+                      ${cliente.deuda}
+                    </p>
+
+                    <p>
+                      Vence:
+                      {cliente.vencimiento}
+                    </p>
+
+                  </div>
+
+                </div>
+
+              </div>
+
+            ))}
+
+          </div>
+
+        </div>
+
+      )}
+
+      {/* ======================================================
+      CONSIGNACIÓN
+      ====================================================== */}
+
+      {vista === "consignacion" && (
+
+        <div className="bg-white rounded-3xl p-6 shadow-2xl">
+
+          <div className="flex justify-between items-center mb-6">
+
+            <h2 className="text-4xl font-black">
+              Consignaciones
+            </h2>
+
+            <button
+              onClick={() => {
+
+                const nombre =
+                  prompt("Cliente");
+
+                const fechaCobro =
+                  prompt("Fecha cobro");
+
+                const total =
+                  prompt("Total");
+
+                if (nombre) {
+
+                  setConsignaciones([
+                    {
+                      nombre,
+                      fechaCobro,
+                      total,
+                    },
+                    ...consignaciones,
+                  ]);
+
+                }
+
+              }}
+              className="bg-indigo-600 text-white px-6 py-3 rounded-2xl font-bold"
+            >
+              + Nueva
+            </button>
+
+          </div>
+
+          <div className="space-y-4">
+
+            {consignaciones.map((c, i) => (
+
+              <div
+                key={i}
+                className="bg-slate-100 rounded-3xl p-5"
+              >
+
+                <div className="flex justify-between">
+
+                  <div>
+
+                    <h3 className="text-2xl font-black">
+                      {c.nombre}
+                    </h3>
+
+                    <p>
+                      Cobro:
+                      {c.fechaCobro}
+                    </p>
+
+                  </div>
+
+                  <div className="text-right">
+
+                    <p className="text-3xl font-black text-indigo-600">
+                      ${c.total}
+                    </p>
+
+                  </div>
+
+                </div>
+
+              </div>
+
+            ))}
+
+          </div>
+
+        </div>
+
+      )}
+
+      {/* ======================================================
+      MODAL NUEVO PRODUCTO
+      ====================================================== */}
 
       {mostrarAgregar && (
 
