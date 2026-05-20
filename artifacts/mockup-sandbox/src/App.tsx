@@ -37,10 +37,11 @@ export default function App() {
   // ======================================================
 
   const [vista, setVista] = useState<
+    "dashboard" | 
     "caja" |
     "stock" |
     "ventas"
-  >("caja");
+  >("dashboard");
 
   const [productos, setProductos] =
     useState<Producto[]>([]);
@@ -562,6 +563,20 @@ Gracias ❤️`;
 
         <button
           onClick={() =>
+            setVista("dashboard")
+          }
+          className={`px-5 py-3 rounded-2xl font-bold ${
+            vista === "dashboard"
+              ? "bg-indigo-600 text-white"
+              : "bg-slate-100"
+          }`}
+        >
+          Dashboard
+        </button>
+      
+
+        <button
+          onClick={() =>
             setVista("caja")
           }
           className={`px-5 py-3 rounded-2xl font-black ${
@@ -605,6 +620,16 @@ Gracias ❤️`;
       CAJA
       ====================================================== */}
 
+      {vista === "dashboard" && (
+
+        <Dashboard
+          ventas={ventas}
+          productos={productos}
+        />
+
+      )}
+
+      
       {vista === "caja" && (
 
         <div className="grid grid-cols-1 xl:grid-cols-3 gap-4 p-4">
