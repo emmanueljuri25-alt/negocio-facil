@@ -1,6 +1,24 @@
+import { useState } from "react";
+import Login from "./components/Login";
+
 import { useEffect, useMemo, useState } from "react";
 
 export default function App() {
+
+    const [logueado, setLogueado] =
+          useState(false);
+
+    if (!logueado) {
+    return (
+    <Login
+      onLogin={() =>
+        setLogueado(true)
+      }
+    />
+  );
+}
+
+
 
   // ======================================================
   // TYPES
