@@ -1,16 +1,17 @@
-import {
-  useEffect,
-  useMemo,
-  useState,
-} from "react";
-
+import { useEffect, useMemo, useState } from "react";
 import Login from "./components/Login";
+
+type Producto = {
+  id: number;
+  nombre: string;
+  precio: number;
+  stock: number;
+  categoria: string;
+};
 
 export default function App() {
 
-  // ======================================================
   // LOGIN
-  // ======================================================
 
   const [logueado, setLogueado] =
     useState(false);
@@ -27,21 +28,7 @@ export default function App() {
 
   }
 
-  // ======================================================
-  // TYPES
-  // ======================================================
-
-  type Producto = {
-    id: number;
-    nombre: string;
-    precio: number;
-    stock: number;
-    categoria: string;
-  };
-
-  // ======================================================
   // STATES
-  // ======================================================
 
   const [vista, setVista] = useState<
     "caja" |
@@ -58,18 +45,16 @@ export default function App() {
   const [ventas, setVentas] =
     useState<any[]>([]);
 
-  const [telefonoCliente, setTelefonoCliente] =
+  const [busqueda, setBusqueda] =
     useState("");
 
   const [montoRecibido, setMontoRecibido] =
     useState("");
 
-  const [busqueda, setBusqueda] =
+  const [telefonoCliente, setTelefonoCliente] =
     useState("");
 
-  // ======================================================
   // NUEVO PRODUCTO
-  // ======================================================
 
   const [mostrarNuevo, setMostrarNuevo] =
     useState(false);
@@ -86,19 +71,7 @@ export default function App() {
   const [nuevoCategoria, setNuevoCategoria] =
     useState("");
 
-  // ======================================================
-  // PRODUCTO MANUAL
-  // ======================================================
-
-  const [productoManual, setProductoManual] =
-    useState("");
-
-  const [precioManual, setPrecioManual] =
-    useState("");
-
-  // ======================================================
   // STORAGE
-  // ======================================================
 
   useEffect(() => {
 
@@ -121,14 +94,14 @@ export default function App() {
       setProductos([
         {
           id: 1,
-          nombre: "Coca Cola 2.25",
+          nombre: "Coca Cola",
           precio: 3500,
           stock: 10,
           categoria: "Bebidas",
         },
         {
           id: 2,
-          nombre: "Yerba 1KG",
+          nombre: "Yerba",
           precio: 7200,
           stock: 5,
           categoria: "Almacén",
@@ -157,9 +130,7 @@ export default function App() {
 
   }, [ventas]);
 
-  // ======================================================
   // FILTRO
-  // ======================================================
 
   const productosFiltrados =
     useMemo(() => {
@@ -174,9 +145,7 @@ export default function App() {
 
     }, [productos, busqueda]);
 
-  // ======================================================
   // TOTALES
-  // ======================================================
 
   const totalTicket = ticket.reduce(
     (acc, item) =>
@@ -195,27 +164,21 @@ export default function App() {
     Number(montoRecibido || 0) -
     totalTicket;
 
-  // ======================================================
   // AGREGAR PRODUCTO
-  // ======================================================
 
   function agregarProducto() {
 
     if (
       !nuevoNombre ||
       !nuevoPrecio
-    ) {
-      alert("Completar datos");
-      return;
-    }
+    ) return;
 
     const nuevo = {
       id: Date.now(),
       nombre: nuevoNombre,
       precio: Number(nuevoPrecio),
-      stock: Number(nuevoStock || 0),
-      categoria:
-        nuevoCategoria || "General",
+      stock: Number(nuevoStock),
+      categoria: nuevoCategoria,
     };
 
     setProductos([
@@ -229,20 +192,14 @@ export default function App() {
     setNuevoCategoria("");
 
     setMostrarNuevo(false);
+
   }
 
-  // ======================================================
   // AGREGAR TICKET
-  // ======================================================
 
   function agregarAlTicket(
     producto: Producto
   ) {
-
-    if (producto.stock <= 0) {
-      alert("Sin stock");
-      return;
-    }
 
     const existe = ticket.find(
       (t) => t.id === producto.id
@@ -276,55 +233,13 @@ export default function App() {
 
   }
 
-  // ======================================================
-  // PRODUCTO MANUAL
-  // ======================================================
-
-  function agregarProductoManual() {
-
-    if (
-      !productoManual ||
-      !precioManual
-    ) return;
-
-    setTicket([
-      ...ticket,
-      {
-        id: Date.now(),
-        nombre: productoManual,
-        precio: Number(precioManual),
-        cantidad: 1,
-      },
-    ]);
-
-    setProductoManual("");
-    setPrecioManual("");
-  }
-
-  // ======================================================
-  // NUEVA VENTA
-  // ======================================================
-
-  function nuevaVenta() {
-
-    setTicket([]);
-    setMontoRecibido("");
-    setTelefonoCliente("");
-
-  }
-
-  // ======================================================
   // FINALIZAR
-  // ======================================================
 
   function finalizarVenta(
     metodo: string
   ) {
 
-    if (ticket.length === 0) {
-      alert("No hay productos");
-      return;
-    }
+    if (ticket.length === 0) return;
 
     const venta = {
       id: Date.now(),
@@ -361,22 +276,15 @@ export default function App() {
 
     setProductos(actualizados);
 
-    nuevaVenta();
+    setTicket([]);
 
-    alert("Venta realizada");
+    setMontoRecibido("");
 
   }
 
-  // ======================================================
   // WHATSAPP
-  // ======================================================
 
   function enviarWhatsApp() {
-
-    if (!telefonoCliente) {
-      alert("Ingresar WhatsApp");
-      return;
-    }
 
     const numero =
       telefonoCliente.replace(/\D/g, "");
@@ -385,7 +293,7 @@ export default function App() {
       ticket
         .map(
           (p) =>
-            `${p.nombre} x${p.cantidad} - $${p.precio * p.cantidad}`
+            `${p.nombre} x${p.cantidad}`
         )
         .join("\n");
 
@@ -394,38 +302,33 @@ export default function App() {
 
 ${detalle}
 
-TOTAL: $${totalTicket}
+TOTAL: $${totalTicket}`;
 
-Gracias ❤️`;
+    window.open(
+      `https://wa.me/54${numero}?text=${encodeURIComponent(mensaje)}`,
+      "_blank"
+    );
 
-    const url =
-      `https://wa.me/54${numero}?text=${encodeURIComponent(mensaje)}`;
-
-    window.open(url, "_blank");
   }
 
-  // ======================================================
   // QR
-  // ======================================================
 
   const qr =
     `https://api.qrserver.com/v1/create-qr-code/?size=250x250&data=TOTAL:${totalTicket}`;
 
-  // ======================================================
   // UI
-  // ======================================================
 
   return (
 
-    <div className="min-h-screen bg-gradient-to-br from-slate-100 via-white to-indigo-100">
+    <div className="min-h-screen bg-slate-100">
 
       {/* HEADER */}
 
-      <div className="bg-white shadow-xl p-5 flex justify-between items-center flex-wrap gap-4">
+      <div className="bg-white p-5 shadow-lg flex justify-between items-center">
 
         <div>
 
-          <h1 className="text-4xl font-black text-slate-800">
+          <h1 className="text-4xl font-black">
             NEGOCIO FÁCIL
           </h1>
 
@@ -435,15 +338,15 @@ Gracias ❤️`;
 
         </div>
 
-        <div className="bg-emerald-100 px-6 py-4 rounded-3xl">
+        <div className="bg-emerald-100 px-5 py-3 rounded-2xl">
 
-          <p className="text-sm text-emerald-700">
+          <p className="text-sm">
             Caja diaria
           </p>
 
-          <h3 className="text-3xl font-black text-emerald-600">
+          <h2 className="text-3xl font-black text-emerald-600">
             ${totalCaja}
-          </h3>
+          </h2>
 
         </div>
 
@@ -457,11 +360,7 @@ Gracias ❤️`;
           onClick={() =>
             setVista("caja")
           }
-          className={`px-5 py-3 rounded-2xl font-black ${
-            vista === "caja"
-              ? "bg-indigo-600 text-white"
-              : "bg-white"
-          }`}
+          className="bg-indigo-600 text-white px-5 py-3 rounded-2xl font-bold"
         >
           Caja
         </button>
@@ -470,11 +369,7 @@ Gracias ❤️`;
           onClick={() =>
             setVista("stock")
           }
-          className={`px-5 py-3 rounded-2xl font-black ${
-            vista === "stock"
-              ? "bg-indigo-600 text-white"
-              : "bg-white"
-          }`}
+          className="bg-white px-5 py-3 rounded-2xl font-bold"
         >
           Stock
         </button>
@@ -483,11 +378,7 @@ Gracias ❤️`;
           onClick={() =>
             setVista("ventas")
           }
-          className={`px-5 py-3 rounded-2xl font-black ${
-            vista === "ventas"
-              ? "bg-indigo-600 text-white"
-              : "bg-white"
-          }`}
+          className="bg-white px-5 py-3 rounded-2xl font-bold"
         >
           Ventas
         </button>
@@ -500,24 +391,22 @@ Gracias ❤️`;
 
         <div className="grid grid-cols-1 xl:grid-cols-3 gap-4 p-4">
 
+          {/* PRODUCTOS */}
+
           <div className="xl:col-span-2">
 
-            <div className="bg-white rounded-3xl p-4 shadow-xl mb-4">
+            <input
+              placeholder="Buscar producto..."
+              value={busqueda}
+              onChange={(e) =>
+                setBusqueda(
+                  e.target.value
+                )
+              }
+              className="w-full p-4 rounded-2xl mb-4"
+            />
 
-              <input
-                placeholder="Buscar producto..."
-                value={busqueda}
-                onChange={(e) =>
-                  setBusqueda(
-                    e.target.value
-                  )
-                }
-                className="w-full bg-slate-100 rounded-2xl p-5 text-xl outline-none"
-              />
-
-            </div>
-
-            <div className="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-4">
+            <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
 
               {productosFiltrados.map(
                 (producto) => (
@@ -529,41 +418,28 @@ Gracias ❤️`;
                         producto
                       )
                     }
-                    className="bg-white rounded-3xl p-4 shadow-xl text-left hover:scale-105 transition-all"
+                    className="bg-white rounded-3xl p-4 shadow-xl text-left"
                   >
 
-                    <div className="flex justify-between">
+                    <h3 className="font-black text-xl">
+                      {
+                        producto.nombre
+                      }
+                    </h3>
 
-                      <span className="bg-indigo-100 text-indigo-700 text-xs font-bold px-3 py-1 rounded-full">
-                        {
-                          producto.categoria
-                        }
-                      </span>
+                    <p className="text-indigo-600 text-3xl font-black mt-3">
+                      $
+                      {
+                        producto.precio
+                      }
+                    </p>
 
-                      <span className="bg-green-500 text-white text-xs font-bold px-3 py-1 rounded-full">
-                        {
-                          producto.stock
-                        }
-                      </span>
-
-                    </div>
-
-                    <div className="mt-6">
-
-                      <h3 className="font-black text-xl">
-                        {
-                          producto.nombre
-                        }
-                      </h3>
-
-                      <p className="text-4xl font-black text-indigo-600 mt-3">
-                        $
-                        {
-                          producto.precio
-                        }
-                      </p>
-
-                    </div>
+                    <p className="mt-3 text-sm">
+                      Stock:
+                      {
+                        producto.stock
+                      }
+                    </p>
 
                   </button>
 
@@ -576,53 +452,13 @@ Gracias ❤️`;
 
           {/* TICKET */}
 
-          <div className="bg-slate-900 text-white rounded-3xl p-5 shadow-2xl">
+          <div className="bg-slate-900 text-white rounded-3xl p-5">
 
             <h2 className="text-4xl font-black">
               Ticket
             </h2>
 
-            {/* MANUAL */}
-
-            <div className="bg-slate-800 rounded-3xl p-4 mt-5">
-
-              <input
-                placeholder="Producto manual"
-                value={productoManual}
-                onChange={(e) =>
-                  setProductoManual(
-                    e.target.value
-                  )
-                }
-                className="w-full bg-white text-black p-4 rounded-2xl mb-3"
-              />
-
-              <input
-                type="number"
-                placeholder="Precio"
-                value={precioManual}
-                onChange={(e) =>
-                  setPrecioManual(
-                    e.target.value
-                  )
-                }
-                className="w-full bg-white text-black p-4 rounded-2xl"
-              />
-
-              <button
-                onClick={
-                  agregarProductoManual
-                }
-                className="w-full bg-indigo-600 p-4 rounded-2xl mt-3 font-black"
-              >
-                Agregar
-              </button>
-
-            </div>
-
-            {/* ITEMS */}
-
-            <div className="space-y-3 mt-5 max-h-[300px] overflow-auto">
+            <div className="space-y-3 mt-5">
 
               {ticket.map((item) => (
 
@@ -633,17 +469,17 @@ Gracias ❤️`;
 
                   <div>
 
-                    <h3 className="font-bold">
+                    <h3>
                       {item.nombre}
                     </h3>
 
-                    <p className="text-slate-400">
+                    <p>
                       x{item.cantidad}
                     </p>
 
                   </div>
 
-                  <p className="text-2xl font-black">
+                  <p className="font-black">
                     $
                     {item.precio *
                       item.cantidad}
@@ -655,23 +491,21 @@ Gracias ❤️`;
 
             </div>
 
-            {/* TOTAL */}
+            <div className="bg-slate-800 p-5 rounded-3xl mt-5">
 
-            <div className="bg-slate-800 rounded-3xl p-5 mt-5 flex justify-between">
+              <div className="flex justify-between">
 
-              <span className="text-slate-400">
-                TOTAL
-              </span>
+                <span>TOTAL</span>
 
-              <span className="text-5xl font-black text-emerald-400">
-                ${totalTicket}
-              </span>
+                <span className="text-4xl font-black text-emerald-400">
+                  ${totalTicket}
+                </span>
+
+              </div>
 
             </div>
 
-            {/* EFECTIVO */}
-
-            <div className="bg-slate-800 rounded-3xl p-5 mt-5">
+            <div className="mt-5">
 
               <input
                 type="number"
@@ -682,16 +516,16 @@ Gracias ❤️`;
                     e.target.value
                   )
                 }
-                className="w-full bg-white text-black p-4 rounded-2xl text-2xl font-black"
+                className="w-full bg-white text-black p-4 rounded-2xl"
               />
 
-              <div className="flex justify-between mt-5">
+              <div className="flex justify-between mt-3">
 
-                <span className="text-slate-400">
+                <span>
                   Cambio
                 </span>
 
-                <span className="text-4xl font-black text-emerald-400">
+                <span className="font-black text-emerald-400">
                   $
                   {cambio > 0
                     ? cambio
@@ -702,8 +536,6 @@ Gracias ❤️`;
 
             </div>
 
-            {/* BOTONES */}
-
             <div className="grid grid-cols-2 gap-3 mt-5">
 
               <button
@@ -712,20 +544,9 @@ Gracias ❤️`;
                     "Efectivo"
                   )
                 }
-                className="bg-emerald-500 p-5 rounded-3xl font-black"
+                className="bg-emerald-500 p-4 rounded-2xl font-black"
               >
                 Efectivo
-              </button>
-
-              <button
-                onClick={() =>
-                  finalizarVenta(
-                    "Transferencia"
-                  )
-                }
-                className="bg-indigo-500 p-5 rounded-3xl font-black"
-              >
-                Transferencia
               </button>
 
               <button
@@ -734,40 +555,27 @@ Gracias ❤️`;
                     "QR"
                   )
                 }
-                className="bg-cyan-500 p-5 rounded-3xl font-black"
+                className="bg-cyan-500 p-4 rounded-2xl font-black"
               >
                 QR
               </button>
 
-              <button
-                onClick={() =>
-                  window.print()
-                }
-                className="bg-pink-500 p-5 rounded-3xl font-black"
-              >
-                Imprimir
-              </button>
-
             </div>
 
-            {/* QR */}
-
-            <div className="bg-white rounded-3xl p-5 mt-5">
+            <div className="bg-white rounded-3xl p-4 mt-5">
 
               <img
                 src={qr}
                 alt="QR"
-                className="w-full rounded-2xl"
+                className="w-full"
               />
 
             </div>
 
-            {/* WHATSAPP */}
-
             <div className="mt-5">
 
               <input
-                placeholder="WhatsApp cliente"
+                placeholder="WhatsApp"
                 value={
                   telefonoCliente
                 }
@@ -783,7 +591,7 @@ Gracias ❤️`;
                 onClick={
                   enviarWhatsApp
                 }
-                className="w-full bg-green-500 p-5 rounded-3xl mt-3 font-black"
+                className="w-full bg-green-500 p-4 rounded-2xl mt-3 font-black"
               >
                 Enviar WhatsApp
               </button>
@@ -802,7 +610,7 @@ Gracias ❤️`;
 
         <div className="p-4">
 
-          <div className="bg-white rounded-3xl p-6 shadow-2xl">
+          <div className="bg-white rounded-3xl p-5">
 
             <div className="flex justify-between items-center">
 
@@ -816,9 +624,184 @@ Gracias ❤️`;
                     true
                   )
                 }
-                className="bg-indigo-600 text-white px-6 py-4 rounded-2xl font-black"
+                className="bg-indigo-600 text-white px-5 py-3 rounded-2xl font-black"
               >
                 + Producto
+              </button>
+
+            </div>
+
+            <div className="space-y-3 mt-5">
+
+              {productos.map(
+                (producto) => (
+
+                  <div
+                    key={producto.id}
+                    className="bg-slate-100 rounded-2xl p-4 flex justify-between"
+                  >
+
+                    <div>
+
+                      <h3 className="font-black">
+                        {
+                          producto.nombre
+                        }
+                      </h3>
+
+                      <p>
+                        Stock:
+                        {
+                          producto.stock
+                        }
+                      </p>
+
+                    </div>
+
+                    <p className="font-black text-indigo-600">
+                      $
+                      {
+                        producto.precio
+                      }
+                    </p>
+
+                  </div>
+
+                )
+              )}
+
+            </div>
+
+          </div>
+
+        </div>
+
+      )}
+
+      {/* VENTAS */}
+
+      {vista === "ventas" && (
+
+        <div className="p-4 space-y-4">
+
+          {ventas.map((venta) => (
+
+            <div
+              key={venta.id}
+              className="bg-white rounded-3xl p-5"
+            >
+
+              <div className="flex justify-between">
+
+                <div>
+
+                  <h3 className="font-black text-2xl">
+                    {venta.metodo}
+                  </h3>
+
+                  <p className="text-gray-500">
+                    {venta.fecha}
+                  </p>
+
+                </div>
+
+                <p className="text-3xl font-black text-indigo-600">
+                  $
+                  {venta.total}
+                </p>
+
+              </div>
+
+            </div>
+
+          ))}
+
+        </div>
+
+      )}
+
+      {/* MODAL */}
+
+      {mostrarNuevo && (
+
+        <div className="fixed inset-0 bg-black/40 flex items-center justify-center p-4">
+
+          <div className="bg-white rounded-3xl p-6 w-full max-w-md">
+
+            <h2 className="text-3xl font-black mb-5">
+              Nuevo producto
+            </h2>
+
+            <div className="space-y-3">
+
+              <input
+                placeholder="Nombre"
+                value={nuevoNombre}
+                onChange={(e) =>
+                  setNuevoNombre(
+                    e.target.value
+                  )
+                }
+                className="w-full border p-4 rounded-2xl"
+              />
+
+              <input
+                placeholder="Categoría"
+                value={nuevoCategoria}
+                onChange={(e) =>
+                  setNuevoCategoria(
+                    e.target.value
+                  )
+                }
+                className="w-full border p-4 rounded-2xl"
+              />
+
+              <input
+                type="number"
+                placeholder="Precio"
+                value={nuevoPrecio}
+                onChange={(e) =>
+                  setNuevoPrecio(
+                    e.target.value
+                  )
+                }
+                className="w-full border p-4 rounded-2xl"
+              />
+
+              <input
+                type="number"
+                placeholder="Stock"
+                value={nuevoStock}
+                onChange={(e) =>
+                  setNuevoStock(
+                    e.target.value
+                  )
+                }
+                className="w-full border p-4 rounded-2xl"
+              />
+
+            </div>
+
+            <div className="grid grid-cols-2 gap-3 mt-5">
+
+              <button
+                onClick={() =>
+                  setMostrarNuevo(
+                    false
+                  )
+                }
+                className="bg-gray-200 p-4 rounded-2xl"
+              >
+                Cancelar
+              </button>
+
+              <button
+                onClick={
+                  agregarProducto
+                }
+                className="bg-indigo-600 text-white p-4 rounded-2xl"
+              >
+                Guardar
               </button>
 
             </div>
@@ -830,5 +813,7 @@ Gracias ❤️`;
       )}
 
     </div>
+
   );
+
 }
