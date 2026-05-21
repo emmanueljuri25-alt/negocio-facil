@@ -1,24 +1,31 @@
-import { useEffect, useMemo, useState } from "react";
+import {
+  useEffect,
+  useMemo,
+  useState,
+} from "react";
+
 import Login from "./components/Login";
-
-
 
 export default function App() {
 
-    const [logueado, setLogueado] =
-          useState(false);
+  // ======================================================
+  // LOGIN
+  // ======================================================
 
-    if (!logueado) {
+  const [logueado, setLogueado] =
+    useState(false);
+
+  if (!logueado) {
+
     return (
-    <Login
-      onLogin={() =>
-        setLogueado(true)
-      }
-    />
-  );
-}
+      <Login
+        onLogin={() =>
+          setLogueado(true)
+        }
+      />
+    );
 
-
+  }
 
   // ======================================================
   // TYPES
@@ -41,8 +48,6 @@ export default function App() {
     "stock" |
     "ventas"
   >("caja");
-
-
 
   const [productos, setProductos] =
     useState<Producto[]>([]);
@@ -128,13 +133,6 @@ export default function App() {
           stock: 5,
           categoria: "Almacén",
         },
-        {
-          id: 3,
-          nombre: "Papas Lays",
-          precio: 2800,
-          stock: 2,
-          categoria: "Snacks",
-        },
       ]);
 
     }
@@ -160,7 +158,7 @@ export default function App() {
   }, [ventas]);
 
   // ======================================================
-  // FILTRO PRODUCTOS
+  // FILTRO
   // ======================================================
 
   const productosFiltrados =
@@ -192,18 +190,6 @@ export default function App() {
       acc + venta.total,
     0
   );
-
-  const totalProductosVendidos =
-    ventas.reduce(
-      (acc, venta) =>
-        acc +
-        venta.productos.reduce(
-          (a: number, p: any) =>
-            a + p.cantidad,
-          0
-        ),
-      0
-    );
 
   const cambio =
     Number(montoRecibido || 0) -
@@ -246,63 +232,7 @@ export default function App() {
   }
 
   // ======================================================
-  // ELIMINAR PRODUCTO
-  // ======================================================
-
-  function eliminarProducto(id: number) {
-
-    const confirmar =
-      confirm(
-        "Eliminar producto?"
-      );
-
-    if (!confirmar) return;
-
-    setProductos(
-      productos.filter(
-        (p) => p.id !== id
-      )
-    );
-
-  }
-
-  // ======================================================
-  // STOCK RAPIDO
-  // ======================================================
-
-  function sumarStock(id: number) {
-
-    setProductos(
-      productos.map((p) =>
-        p.id === id
-          ? {
-              ...p,
-              stock: p.stock + 1,
-            }
-          : p
-      )
-    );
-
-  }
-
-  function restarStock(id: number) {
-
-    setProductos(
-      productos.map((p) =>
-        p.id === id &&
-        p.stock > 0
-          ? {
-              ...p,
-              stock: p.stock - 1,
-            }
-          : p
-      )
-    );
-
-  }
-
-  // ======================================================
-  // AGREGAR AL TICKET
+  // AGREGAR TICKET
   // ======================================================
 
   function agregarAlTicket(
@@ -310,7 +240,7 @@ export default function App() {
   ) {
 
     if (producto.stock <= 0) {
-      alert("Producto agotado");
+      alert("Sin stock");
       return;
     }
 
@@ -357,17 +287,14 @@ export default function App() {
       !precioManual
     ) return;
 
-    const nuevo = {
-      id: Date.now(),
-      nombre: productoManual,
-      precio: Number(precioManual),
-      cantidad: 1,
-      manual: true,
-    };
-
     setTicket([
       ...ticket,
-      nuevo,
+      {
+        id: Date.now(),
+        nombre: productoManual,
+        precio: Number(precioManual),
+        cantidad: 1,
+      },
     ]);
 
     setProductoManual("");
@@ -413,8 +340,6 @@ export default function App() {
       ...ventas,
     ]);
 
-    // DESCONTAR STOCK
-
     const actualizados =
       productos.map((p) => {
 
@@ -449,7 +374,7 @@ export default function App() {
   function enviarWhatsApp() {
 
     if (!telefonoCliente) {
-      alert("Ingresar teléfono");
+      alert("Ingresar WhatsApp");
       return;
     }
 
@@ -496,63 +421,29 @@ Gracias ❤️`;
 
       {/* HEADER */}
 
-      <div className="sticky top-0 z-50 backdrop-blur-xl bg-white/80 border-b border-white/20 shadow-lg">
+      <div className="bg-white shadow-xl p-5 flex justify-between items-center flex-wrap gap-4">
 
-        <div className="p-4 flex flex-wrap gap-4 items-center justify-between">
+        <div>
 
-          <div>
+          <h1 className="text-4xl font-black text-slate-800">
+            NEGOCIO FÁCIL
+          </h1>
 
-            <h1 className="text-4xl font-black text-slate-800">
-              NEGOCIO FÁCIL
-            </h1>
+          <p className="text-gray-500">
+            Sistema POS
+          </p>
 
-            <p className="text-gray-500">
-              Premium POS
-            </p>
+        </div>
 
-          </div>
+        <div className="bg-emerald-100 px-6 py-4 rounded-3xl">
 
-          {/* DASHBOARD */}
+          <p className="text-sm text-emerald-700">
+            Caja diaria
+          </p>
 
-          <div className="flex flex-wrap gap-3">
-
-            <div className="bg-white rounded-2xl p-4 shadow-lg min-w-[140px]">
-
-              <p className="text-sm text-gray-500">
-                Caja diaria
-              </p>
-
-              <h3 className="text-2xl font-black text-emerald-500">
-                ${totalCaja}
-              </h3>
-
-            </div>
-
-            <div className="bg-white rounded-2xl p-4 shadow-lg min-w-[140px]">
-
-              <p className="text-sm text-gray-500">
-                Ventas
-              </p>
-
-              <h3 className="text-2xl font-black text-indigo-500">
-                {ventas.length}
-              </h3>
-
-            </div>
-
-            <div className="bg-white rounded-2xl p-4 shadow-lg min-w-[140px]">
-
-              <p className="text-sm text-gray-500">
-                Productos vendidos
-              </p>
-
-              <h3 className="text-2xl font-black text-pink-500">
-                {totalProductosVendidos}
-              </h3>
-
-            </div>
-
-          </div>
+          <h3 className="text-3xl font-black text-emerald-600">
+            ${totalCaja}
+          </h3>
 
         </div>
 
@@ -560,9 +451,7 @@ Gracias ❤️`;
 
       {/* NAV */}
 
-      <div className="p-4 flex flex-wrap gap-3">
-
-      
+      <div className="p-4 flex gap-3">
 
         <button
           onClick={() =>
@@ -605,22 +494,13 @@ Gracias ❤️`;
 
       </div>
 
-      {/* ======================================================
-      CAJA
-      ====================================================== */}
+      {/* CAJA */}
 
-
-
-      
       {vista === "caja" && (
 
         <div className="grid grid-cols-1 xl:grid-cols-3 gap-4 p-4">
 
-          {/* PRODUCTOS */}
-
           <div className="xl:col-span-2">
-
-            {/* BUSCADOR */}
 
             <div className="bg-white rounded-3xl p-4 shadow-xl mb-4">
 
@@ -637,8 +517,6 @@ Gracias ❤️`;
 
             </div>
 
-            {/* PRODUCTOS */}
-
             <div className="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-4">
 
               {productosFiltrados.map(
@@ -646,19 +524,12 @@ Gracias ❤️`;
 
                   <button
                     key={producto.id}
-                    disabled={
-                      producto.stock <= 0
-                    }
                     onClick={() =>
                       agregarAlTicket(
                         producto
                       )
                     }
-                    className={`rounded-3xl p-4 text-left shadow-xl transition-all ${
-                      producto.stock <= 0
-                        ? "bg-gray-300 opacity-60"
-                        : "bg-white hover:scale-105"
-                    }`}
+                    className="bg-white rounded-3xl p-4 shadow-xl text-left hover:scale-105 transition-all"
                   >
 
                     <div className="flex justify-between">
@@ -669,17 +540,9 @@ Gracias ❤️`;
                         }
                       </span>
 
-                      <span
-                        className={`text-xs font-bold px-3 py-1 rounded-full text-white ${
-                          producto.stock <= 3
-                            ? "bg-red-500"
-                            : "bg-green-500"
-                        }`}
-                      >
+                      <span className="bg-green-500 text-white text-xs font-bold px-3 py-1 rounded-full">
                         {
-                          producto.stock <= 0
-                            ? "AGOTADO"
-                            : producto.stock
+                          producto.stock
                         }
                       </span>
 
@@ -713,33 +576,18 @@ Gracias ❤️`;
 
           {/* TICKET */}
 
-          <div className="bg-slate-900 text-white rounded-3xl p-5 shadow-2xl sticky top-28 h-fit">
+          <div className="bg-slate-900 text-white rounded-3xl p-5 shadow-2xl">
 
-            <div className="flex justify-between items-center">
-
-              <h2 className="text-4xl font-black">
-                Ticket
-              </h2>
-
-              <button
-                onClick={nuevaVenta}
-                className="bg-red-500 px-4 py-2 rounded-2xl font-bold"
-              >
-                Nueva
-              </button>
-
-            </div>
+            <h2 className="text-4xl font-black">
+              Ticket
+            </h2>
 
             {/* MANUAL */}
 
             <div className="bg-slate-800 rounded-3xl p-4 mt-5">
 
-              <h3 className="font-bold mb-3">
-                Producto manual
-              </h3>
-
               <input
-                placeholder="Producto"
+                placeholder="Producto manual"
                 value={productoManual}
                 onChange={(e) =>
                   setProductoManual(
@@ -795,15 +643,11 @@ Gracias ❤️`;
 
                   </div>
 
-                  <div>
-
-                    <p className="text-2xl font-black">
-                      $
-                      {item.precio *
-                        item.cantidad}
-                    </p>
-
-                  </div>
+                  <p className="text-2xl font-black">
+                    $
+                    {item.precio *
+                      item.cantidad}
+                  </p>
 
                 </div>
 
@@ -813,19 +657,15 @@ Gracias ❤️`;
 
             {/* TOTAL */}
 
-            <div className="bg-slate-800 rounded-3xl p-5 mt-5">
+            <div className="bg-slate-800 rounded-3xl p-5 mt-5 flex justify-between">
 
-              <div className="flex justify-between">
+              <span className="text-slate-400">
+                TOTAL
+              </span>
 
-                <span className="text-slate-400">
-                  TOTAL
-                </span>
-
-                <span className="text-5xl font-black text-emerald-400">
-                  ${totalTicket}
-                </span>
-
-              </div>
+              <span className="text-5xl font-black text-emerald-400">
+                ${totalTicket}
+              </span>
 
             </div>
 
@@ -872,7 +712,7 @@ Gracias ❤️`;
                     "Efectivo"
                   )
                 }
-                className="bg-emerald-500 p-5 rounded-3xl font-black text-xl"
+                className="bg-emerald-500 p-5 rounded-3xl font-black"
               >
                 Efectivo
               </button>
@@ -883,7 +723,7 @@ Gracias ❤️`;
                     "Transferencia"
                   )
                 }
-                className="bg-indigo-500 p-5 rounded-3xl font-black text-xl"
+                className="bg-indigo-500 p-5 rounded-3xl font-black"
               >
                 Transferencia
               </button>
@@ -894,7 +734,7 @@ Gracias ❤️`;
                     "QR"
                   )
                 }
-                className="bg-cyan-500 p-5 rounded-3xl font-black text-xl"
+                className="bg-cyan-500 p-5 rounded-3xl font-black"
               >
                 QR
               </button>
@@ -903,7 +743,7 @@ Gracias ❤️`;
                 onClick={() =>
                   window.print()
                 }
-                className="bg-pink-500 p-5 rounded-3xl font-black text-xl"
+                className="bg-pink-500 p-5 rounded-3xl font-black"
               >
                 Imprimir
               </button>
@@ -943,7 +783,7 @@ Gracias ❤️`;
                 onClick={
                   enviarWhatsApp
                 }
-                className="w-full bg-green-500 p-5 rounded-3xl mt-3 font-black text-xl"
+                className="w-full bg-green-500 p-5 rounded-3xl mt-3 font-black"
               >
                 Enviar WhatsApp
               </button>
@@ -956,9 +796,7 @@ Gracias ❤️`;
 
       )}
 
-      {/* ======================================================
-      STOCK
-      ====================================================== */}
+      {/* STOCK */}
 
       {vista === "stock" && (
 
@@ -966,7 +804,7 @@ Gracias ❤️`;
 
           <div className="bg-white rounded-3xl p-6 shadow-2xl">
 
-            <div className="flex justify-between items-center flex-wrap gap-4">
+            <div className="flex justify-between items-center">
 
               <h2 className="text-4xl font-black">
                 Stock
@@ -978,242 +816,9 @@ Gracias ❤️`;
                     true
                   )
                 }
-                className="bg-indigo-600 text-white px-6 py-4 rounded-2xl text-xl font-black"
+                className="bg-indigo-600 text-white px-6 py-4 rounded-2xl font-black"
               >
                 + Producto
-              </button>
-
-            </div>
-
-            <div className="space-y-4 mt-6">
-
-              {productos.map(
-                (producto) => (
-
-                  <div
-                    key={producto.id}
-                    className="bg-slate-100 rounded-3xl p-5"
-                  >
-
-                    <div className="flex justify-between items-center flex-wrap gap-4">
-
-                      <div>
-
-                        <h3 className="text-2xl font-black">
-                          {
-                            producto.nombre
-                          }
-                        </h3>
-
-                        <p className="text-gray-500">
-                          {
-                            producto.categoria
-                          }
-                        </p>
-
-                      </div>
-
-                      <div className="flex gap-2 items-center">
-
-                        <button
-                          onClick={() =>
-                            restarStock(
-                              producto.id
-                            )
-                          }
-                          className="bg-red-500 text-white w-10 h-10 rounded-xl font-black"
-                        >
-                          -
-                        </button>
-
-                        <div className="bg-white px-5 py-3 rounded-2xl font-black text-xl">
-                          {
-                            producto.stock
-                          }
-                        </div>
-
-                        <button
-                          onClick={() =>
-                            sumarStock(
-                              producto.id
-                            )
-                          }
-                          className="bg-green-500 text-white w-10 h-10 rounded-xl font-black"
-                        >
-                          +
-                        </button>
-
-                      </div>
-
-                      <div>
-
-                        <p className="text-3xl font-black text-indigo-600">
-                          $
-                          {
-                            producto.precio
-                          }
-                        </p>
-
-                      </div>
-
-                      <button
-                        onClick={() =>
-                          eliminarProducto(
-                            producto.id
-                          )
-                        }
-                        className="bg-red-500 text-white px-5 py-3 rounded-2xl font-bold"
-                      >
-                        Eliminar
-                      </button>
-
-                    </div>
-
-                  </div>
-
-                )
-              )}
-
-            </div>
-
-          </div>
-
-        </div>
-
-      )}
-
-      {/* ======================================================
-      VENTAS
-      ====================================================== */}
-
-      {vista === "ventas" && (
-
-        <div className="p-4 space-y-4">
-
-          {ventas.map((venta) => (
-
-            <div
-              key={venta.id}
-              className="bg-white rounded-3xl p-5 shadow-xl"
-            >
-
-              <div className="flex justify-between flex-wrap gap-4">
-
-                <div>
-
-                  <h3 className="text-2xl font-black">
-                    {venta.metodo}
-                  </h3>
-
-                  <p className="text-gray-500">
-                    {venta.fecha}
-                  </p>
-
-                </div>
-
-                <div>
-
-                  <p className="text-4xl font-black text-indigo-600">
-                    $
-                    {venta.total}
-                  </p>
-
-                </div>
-
-              </div>
-
-            </div>
-
-          ))}
-
-        </div>
-
-      )}
-
-      {/* ======================================================
-      MODAL PRODUCTO
-      ====================================================== */}
-
-      {mostrarNuevo && (
-
-        <div className="fixed inset-0 bg-black/40 flex items-center justify-center p-4 z-50">
-
-          <div className="bg-white rounded-3xl p-6 w-full max-w-md">
-
-            <h2 className="text-3xl font-black mb-5">
-              Nuevo producto
-            </h2>
-
-            <div className="space-y-4">
-
-              <input
-                placeholder="Nombre"
-                value={nuevoNombre}
-                onChange={(e) =>
-                  setNuevoNombre(
-                    e.target.value
-                  )
-                }
-                className="w-full border p-4 rounded-2xl"
-              />
-
-              <input
-                placeholder="Categoría"
-                value={nuevoCategoria}
-                onChange={(e) =>
-                  setNuevoCategoria(
-                    e.target.value
-                  )
-                }
-                className="w-full border p-4 rounded-2xl"
-              />
-
-              <input
-                type="number"
-                placeholder="Precio"
-                value={nuevoPrecio}
-                onChange={(e) =>
-                  setNuevoPrecio(
-                    e.target.value
-                  )
-                }
-                className="w-full border p-4 rounded-2xl"
-              />
-
-              <input
-                type="number"
-                placeholder="Stock"
-                value={nuevoStock}
-                onChange={(e) =>
-                  setNuevoStock(
-                    e.target.value
-                  )
-                }
-                className="w-full border p-4 rounded-2xl"
-              />
-
-            </div>
-
-            <div className="grid grid-cols-2 gap-3 mt-6">
-
-              <button
-                onClick={() =>
-                  setMostrarNuevo(
-                    false
-                  )
-                }
-                className="bg-gray-200 p-4 rounded-2xl font-bold"
-              >
-                Cancelar
-              </button>
-
-              <button
-                onClick={
-                  agregarProducto
-                }
-                className="bg-indigo-600 text-white p-4 rounded-2xl font-bold"
-              >
-                Guardar
               </button>
 
             </div>
