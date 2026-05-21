@@ -1,6 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
 import Login from "./components/Login";
-import Dashboard from "./components/Dashboard";
 
 
 
@@ -38,11 +37,12 @@ export default function App() {
   // ======================================================
 
   const [vista, setVista] = useState<
-    "dashboard" | 
     "caja" |
     "stock" |
     "ventas"
-  >("dashboard");
+  >("caja");
+
+
 
   const [productos, setProductos] =
     useState<Producto[]>([]);
@@ -562,18 +562,6 @@ Gracias ❤️`;
 
       <div className="p-4 flex flex-wrap gap-3">
 
-        <button
-          onClick={() =>
-            setVista("dashboard")
-          }
-          className={`px-5 py-3 rounded-2xl font-bold ${
-            vista === "dashboard"
-              ? "bg-indigo-600 text-white"
-              : "bg-slate-100"
-          }`}
-        >
-          Dashboard
-        </button>
       
 
         <button
@@ -621,14 +609,7 @@ Gracias ❤️`;
       CAJA
       ====================================================== */}
 
-      {vista === "dashboard" && (
 
-        <Dashboard
-          ventas={ventas}
-          productos={productos}
-        />
-
-      )}
 
       
       {vista === "caja" && (
