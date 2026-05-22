@@ -6,6 +6,10 @@ import {
 
 export default function App() {
 
+  // ======================================================
+  // TYPES
+  // ======================================================
+
   type Producto = {
     id: number;
     nombre: string;
@@ -13,6 +17,25 @@ export default function App() {
     stock: number;
     categoria: string;
   };
+
+  type ItemTicket = {
+    id: number;
+    nombre: string;
+    precio: number;
+    cantidad: number;
+  };
+
+  type Venta = {
+    id: number;
+    fecha: string;
+    metodo: string;
+    total: number;
+    productos: ItemTicket[];
+  };
+
+  // ======================================================
+  // STATES
+  // ======================================================
 
   const [vista, setVista] =
     useState<
@@ -25,10 +48,10 @@ export default function App() {
     useState<Producto[]>([]);
 
   const [ticket, setTicket] =
-    useState<any[]>([]);
+    useState<ItemTicket[]>([]);
 
   const [ventas, setVentas] =
-    useState<any[]>([]);
+    useState<Venta[]>([]);
 
   const [busqueda, setBusqueda] =
     useState("");
@@ -59,7 +82,6 @@ export default function App() {
 
   const [precioManual, setPrecioManual] =
     useState("");
-
   // ======================================================
   // STORAGE
   // ======================================================
@@ -210,7 +232,8 @@ export default function App() {
     }
 
     const existe = ticket.find(
-      (t) => t.id === producto.id
+      (t: ItemTicket) =>
+        t.id === producto.id
     );
 
     if (existe) {
@@ -297,9 +320,10 @@ export default function App() {
       productos.map((p) => {
 
         const vendido =
-          ticket.find(
-            (t) => t.id === p.id
-          );
+        ticket.find(
+          (t: ItemTicket) =>
+            t.id === p.id
+        );
 
         if (!vendido) return p;
 
@@ -550,7 +574,7 @@ TOTAL: $${totalTicket}`;
 
             <div className="space-y-3 mt-5 max-h-[300px] overflow-auto">
 
-              {ticket.map((item) => (
+              {ticket.map((item: ItemTicket) => (
 
                 <div
                   key={item.id}
@@ -793,8 +817,8 @@ TOTAL: $${totalTicket}`;
       {vista === "ventas" && (
 
         <div className="p-4 space-y-4">
-
-          {ventas.map((venta) => (
+        
+          {ventas.map((venta: Venta) => (
 
             <div
               key={venta.id}
