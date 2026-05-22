@@ -5,6 +5,9 @@ export default defineConfig({
   plugins: [react()],
   server: {
     host: "0.0.0.0",
-    port: Number(process.env.PORT) || 10000,
+    port: 10000,
+    allowedHosts: [
+      "negocio-facil-f9hp.onrender.com"
+    ],
   },
 });
