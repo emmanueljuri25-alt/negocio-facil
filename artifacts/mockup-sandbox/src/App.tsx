@@ -82,6 +82,7 @@ export default function App() {
 
   const [precioManual, setPrecioManual] =
     useState("");
+
   // ======================================================
   // STORAGE
   // ======================================================
@@ -302,7 +303,7 @@ export default function App() {
       return;
     }
 
-    const venta = {
+    const venta: Venta = {
       id: Date.now(),
       fecha:
         new Date().toLocaleString(),
@@ -320,10 +321,10 @@ export default function App() {
       productos.map((p) => {
 
         const vendido =
-        ticket.find(
-          (t: ItemTicket) =>
-            t.id === p.id
-        );
+          ticket.find(
+            (t: ItemTicket) =>
+              t.id === p.id
+          );
 
         if (!vendido) return p;
 
@@ -391,33 +392,37 @@ TOTAL: $${totalTicket}`;
 
   return (
 
-    <div className="min-h-screen bg-slate-100">
+    <div className="min-h-screen text-white bg-[radial-gradient(circle_at_top_left,_#1e1b4b,_transparent_25%),radial-gradient(circle_at_bottom_right,_#0f172a,_transparent_35%),#020617]">
 
       {/* HEADER */}
 
-      <div className="bg-white shadow-xl p-4 sticky top-0 z-50">
+      <div className="sticky top-0 z-50 backdrop-blur-2xl bg-black/30 border-b border-cyan-500/20 shadow-[0_0_40px_rgba(0,255,255,0.15)] p-4">
 
-        <div className="flex flex-wrap gap-3 justify-between items-center">
+        <div className="flex flex-wrap gap-4 justify-between items-center">
 
           <div>
 
-            <h1 className="text-4xl font-black">
+            <h1 className="text-5xl font-black tracking-widest bg-gradient-to-r from-cyan-400 via-fuchsia-500 to-cyan-400 bg-clip-text text-transparent drop-shadow-[0_0_20px_rgba(0,255,255,0.8)]">
               NEGOCIO FÁCIL
             </h1>
 
-            <p className="text-gray-500">
-              Sistema POS
+            <p className="text-cyan-300 mt-1 tracking-[4px] uppercase text-sm">
+              Cyberpunk POS System
             </p>
 
           </div>
 
-          <div className="flex gap-3">
+          <div className="flex gap-3 flex-wrap">
 
             <button
               onClick={() =>
                 setVista("caja")
               }
-              className="bg-indigo-600 text-white px-5 py-3 rounded-2xl font-bold"
+              className={`px-6 py-3 rounded-2xl font-black transition-all duration-300 ${
+                vista === "caja"
+                  ? "bg-gradient-to-r from-cyan-500 to-fuchsia-500 shadow-[0_0_25px_rgba(0,255,255,0.7)] scale-105"
+                  : "bg-white/5 border border-cyan-500/20 hover:bg-cyan-500/10"
+              }`}
             >
               Caja
             </button>
@@ -426,7 +431,11 @@ TOTAL: $${totalTicket}`;
               onClick={() =>
                 setVista("stock")
               }
-              className="bg-white border px-5 py-3 rounded-2xl font-bold"
+              className={`px-6 py-3 rounded-2xl font-black transition-all duration-300 ${
+                vista === "stock"
+                  ? "bg-gradient-to-r from-cyan-500 to-fuchsia-500 shadow-[0_0_25px_rgba(0,255,255,0.7)] scale-105"
+                  : "bg-white/5 border border-cyan-500/20 hover:bg-cyan-500/10"
+              }`}
             >
               Stock
             </button>
@@ -435,7 +444,11 @@ TOTAL: $${totalTicket}`;
               onClick={() =>
                 setVista("ventas")
               }
-              className="bg-white border px-5 py-3 rounded-2xl font-bold"
+              className={`px-6 py-3 rounded-2xl font-black transition-all duration-300 ${
+                vista === "ventas"
+                  ? "bg-gradient-to-r from-cyan-500 to-fuchsia-500 shadow-[0_0_25px_rgba(0,255,255,0.7)] scale-105"
+                  : "bg-white/5 border border-cyan-500/20 hover:bg-cyan-500/10"
+              }`}
             >
               Ventas
             </button>
@@ -445,503 +458,6 @@ TOTAL: $${totalTicket}`;
         </div>
 
       </div>
-
-      {/* CAJA */}
-
-      {vista === "caja" && (
-
-        <div className="grid grid-cols-1 xl:grid-cols-3 gap-4 p-4">
-
-          {/* PRODUCTOS */}
-
-          <div className="xl:col-span-2">
-
-            <div className="bg-white rounded-3xl p-4 shadow-xl mb-4">
-
-              <input
-                placeholder="Buscar producto..."
-                value={busqueda}
-                onChange={(e) =>
-                  setBusqueda(
-                    e.target.value
-                  )
-                }
-                className="w-full bg-slate-100 p-4 rounded-2xl"
-              />
-
-            </div>
-
-            <div className="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-4">
-
-              {productosFiltrados.map(
-                (producto) => (
-
-                  <button
-                    key={producto.id}
-                    onClick={() =>
-                      agregarAlTicket(
-                        producto
-                      )
-                    }
-                    className="bg-white rounded-3xl p-4 shadow-xl text-left"
-                  >
-
-                    <div className="flex justify-between">
-
-                      <span className="bg-indigo-100 text-indigo-700 text-xs px-3 py-1 rounded-full font-bold">
-                        {
-                          producto.categoria
-                        }
-                      </span>
-
-                      <span className="font-black">
-                        {
-                          producto.stock
-                        }
-                      </span>
-
-                    </div>
-
-                    <h3 className="font-black text-xl mt-5">
-                      {
-                        producto.nombre
-                      }
-                    </h3>
-
-                    <p className="text-4xl font-black text-indigo-600 mt-3">
-                      $
-                      {
-                        producto.precio
-                      }
-                    </p>
-
-                  </button>
-
-                )
-              )}
-
-            </div>
-
-          </div>
-
-          {/* TICKET */}
-
-          <div className="bg-slate-900 text-white rounded-3xl p-5 shadow-2xl">
-
-            <h2 className="text-4xl font-black">
-              Ticket
-            </h2>
-
-            {/* MANUAL */}
-
-            <div className="bg-slate-800 rounded-3xl p-4 mt-5">
-
-              <input
-                placeholder="Producto manual"
-                value={productoManual}
-                onChange={(e) =>
-                  setProductoManual(
-                    e.target.value
-                  )
-                }
-                className="w-full bg-white text-black p-4 rounded-2xl mb-3"
-              />
-
-              <input
-                type="number"
-                placeholder="Precio"
-                value={precioManual}
-                onChange={(e) =>
-                  setPrecioManual(
-                    e.target.value
-                  )
-                }
-                className="w-full bg-white text-black p-4 rounded-2xl"
-              />
-
-              <button
-                onClick={
-                  agregarProductoManual
-                }
-                className="w-full bg-indigo-600 p-4 rounded-2xl mt-3 font-bold"
-              >
-                Agregar
-              </button>
-
-            </div>
-
-            {/* ITEMS */}
-
-            <div className="space-y-3 mt-5 max-h-[300px] overflow-auto">
-
-              {ticket.map((item: ItemTicket) => (
-
-                <div
-                  key={item.id}
-                  className="bg-slate-800 rounded-2xl p-4 flex justify-between"
-                >
-
-                  <div>
-
-                    <h3 className="font-bold">
-                      {item.nombre}
-                    </h3>
-
-                    <p className="text-slate-400">
-                      x{item.cantidad}
-                    </p>
-
-                  </div>
-
-                  <div className="font-black text-2xl">
-                    $
-                    {item.precio *
-                      item.cantidad}
-                  </div>
-
-                </div>
-
-              ))}
-
-            </div>
-
-            {/* TOTAL */}
-
-            <div className="bg-slate-800 rounded-3xl p-5 mt-5 flex justify-between">
-
-              <span>
-                TOTAL
-              </span>
-
-              <span className="text-5xl font-black text-emerald-400">
-                ${totalTicket}
-              </span>
-
-            </div>
-
-            {/* EFECTIVO */}
-
-            <div className="bg-slate-800 rounded-3xl p-5 mt-5">
-
-              <input
-                type="number"
-                placeholder="Dinero recibido"
-                value={montoRecibido}
-                onChange={(e) =>
-                  setMontoRecibido(
-                    e.target.value
-                  )
-                }
-                className="w-full bg-white text-black p-4 rounded-2xl"
-              />
-
-              <div className="flex justify-between mt-4">
-
-                <span>
-                  Cambio
-                </span>
-
-                <span className="text-4xl font-black text-emerald-400">
-                  $
-                  {cambio > 0
-                    ? cambio
-                    : 0}
-                </span>
-
-              </div>
-
-            </div>
-
-            {/* BOTONES */}
-
-            <div className="grid grid-cols-2 gap-3 mt-5">
-
-              <button
-                onClick={() =>
-                  finalizarVenta(
-                    "Efectivo"
-                  )
-                }
-                className="bg-emerald-500 p-5 rounded-3xl font-black"
-              >
-                Efectivo
-              </button>
-
-              <button
-                onClick={() =>
-                  finalizarVenta(
-                    "Transferencia"
-                  )
-                }
-                className="bg-indigo-500 p-5 rounded-3xl font-black"
-              >
-                Transferencia
-              </button>
-
-              <button
-                onClick={() =>
-                  finalizarVenta("QR")
-                }
-                className="bg-cyan-500 p-5 rounded-3xl font-black"
-              >
-                QR
-              </button>
-
-              <button
-                onClick={() =>
-                  window.print()
-                }
-                className="bg-pink-500 p-5 rounded-3xl font-black"
-              >
-                Imprimir
-              </button>
-
-            </div>
-
-            {/* QR */}
-
-            <div className="bg-white rounded-3xl p-5 mt-5">
-
-              <img
-                src={qr}
-                alt="QR"
-                className="w-full"
-              />
-
-            </div>
-
-            {/* WHATSAPP */}
-
-            <div className="mt-5">
-
-              <input
-                placeholder="WhatsApp cliente"
-                value={telefonoCliente}
-                onChange={(e) =>
-                  setTelefonoCliente(
-                    e.target.value
-                  )
-                }
-                className="w-full bg-white text-black p-4 rounded-2xl"
-              />
-
-              <button
-                onClick={
-                  enviarWhatsApp
-                }
-                className="w-full bg-green-500 p-5 rounded-3xl mt-3 font-black"
-              >
-                Enviar WhatsApp
-              </button>
-
-            </div>
-
-          </div>
-
-        </div>
-
-      )}
-
-      {/* STOCK */}
-
-      {vista === "stock" && (
-
-        <div className="p-4">
-
-          <div className="bg-white rounded-3xl p-6 shadow-xl">
-
-            <div className="flex justify-between items-center">
-
-              <h2 className="text-4xl font-black">
-                Stock
-              </h2>
-
-              <button
-                onClick={() =>
-                  setMostrarNuevo(true)
-                }
-                className="bg-indigo-600 text-white px-5 py-3 rounded-2xl font-bold"
-              >
-                + Producto
-              </button>
-
-            </div>
-
-            <div className="space-y-3 mt-5">
-
-              {productos.map((p) => (
-
-                <div
-                  key={p.id}
-                  className="bg-slate-100 rounded-3xl p-5 flex justify-between"
-                >
-
-                  <div>
-
-                    <h3 className="text-2xl font-black">
-                      {p.nombre}
-                    </h3>
-
-                    <p className="text-gray-500">
-                      {p.categoria}
-                    </p>
-
-                  </div>
-
-                  <div className="text-right">
-
-                    <p className="text-3xl font-black text-indigo-600">
-                      ${p.precio}
-                    </p>
-
-                    <p>
-                      Stock: {p.stock}
-                    </p>
-
-                  </div>
-
-                </div>
-
-              ))}
-
-            </div>
-
-          </div>
-
-        </div>
-
-      )}
-
-      {/* VENTAS */}
-
-      {vista === "ventas" && (
-
-        <div className="p-4 space-y-4">
-        
-          {ventas.map((venta: Venta) => (
-
-            <div
-              key={venta.id}
-              className="bg-white rounded-3xl p-5 shadow-xl"
-            >
-
-              <div className="flex justify-between">
-
-                <div>
-
-                  <h3 className="text-2xl font-black">
-                    {venta.metodo}
-                  </h3>
-
-                  <p className="text-gray-500">
-                    {venta.fecha}
-                  </p>
-
-                </div>
-
-                <div className="text-4xl font-black text-indigo-600">
-                  ${venta.total}
-                </div>
-
-              </div>
-
-            </div>
-
-          ))}
-
-        </div>
-
-      )}
-
-      {/* MODAL */}
-
-      {mostrarNuevo && (
-
-        <div className="fixed inset-0 bg-black/40 flex items-center justify-center p-4">
-
-          <div className="bg-white rounded-3xl p-6 w-full max-w-md">
-
-            <h2 className="text-3xl font-black mb-5">
-              Nuevo producto
-            </h2>
-
-            <div className="space-y-4">
-
-              <input
-                placeholder="Nombre"
-                value={nuevoNombre}
-                onChange={(e) =>
-                  setNuevoNombre(
-                    e.target.value
-                  )
-                }
-                className="w-full border p-4 rounded-2xl"
-              />
-
-              <input
-                placeholder="Categoría"
-                value={nuevoCategoria}
-                onChange={(e) =>
-                  setNuevoCategoria(
-                    e.target.value
-                  )
-                }
-                className="w-full border p-4 rounded-2xl"
-              />
-
-              <input
-                type="number"
-                placeholder="Precio"
-                value={nuevoPrecio}
-                onChange={(e) =>
-                  setNuevoPrecio(
-                    e.target.value
-                  )
-                }
-                className="w-full border p-4 rounded-2xl"
-              />
-
-              <input
-                type="number"
-                placeholder="Stock"
-                value={nuevoStock}
-                onChange={(e) =>
-                  setNuevoStock(
-                    e.target.value
-                  )
-                }
-                className="w-full border p-4 rounded-2xl"
-              />
-
-            </div>
-
-            <div className="grid grid-cols-2 gap-3 mt-6">
-
-              <button
-                onClick={() =>
-                  setMostrarNuevo(false)
-                }
-                className="bg-gray-200 p-4 rounded-2xl font-bold"
-              >
-                Cancelar
-              </button>
-
-              <button
-                onClick={
-                  agregarProducto
-                }
-                className="bg-indigo-600 text-white p-4 rounded-2xl font-bold"
-              >
-                Guardar
-              </button>
-
-            </div>
-
-          </div>
-
-        </div>
-
-      )}
 
     </div>
 
