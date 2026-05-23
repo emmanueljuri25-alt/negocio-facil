@@ -38,10 +38,11 @@ export default function App() {
   // ======================================================
 
   const [vista, setVista] = useState<
+    "dashboard" |
     "caja" |
     "stock" |
     "ventas"
-  >("caja");
+  >("dashboard");
 
   const [productos, setProductos] =
     useState<Producto[]>([]);
@@ -61,10 +62,6 @@ export default function App() {
   const [busqueda, setBusqueda] =
     useState("");
 
-  // ======================================================
-  // NUEVO PRODUCTO
-  // ======================================================
-
   const [mostrarNuevo, setMostrarNuevo] =
     useState(false);
 
@@ -79,10 +76,6 @@ export default function App() {
 
   const [nuevoCategoria, setNuevoCategoria] =
     useState("");
-
-  // ======================================================
-  // PRODUCTO MANUAL
-  // ======================================================
 
   const [productoManual, setProductoManual] =
     useState("");
@@ -104,13 +97,7 @@ export default function App() {
 
     if (p) {
       setProductos(JSON.parse(p));
-    }
-
-    if (v) {
-      setVentas(JSON.parse(v));
-    }
-
-    if (!p) {
+    } else {
 
       setProductos([
         {
@@ -127,8 +114,19 @@ export default function App() {
           stock: 5,
           categoria: "Almacén",
         },
+        {
+          id: 3,
+          nombre: "Papas Lays",
+          precio: 2800,
+          stock: 7,
+          categoria: "Snacks",
+        },
       ]);
 
+    }
+
+    if (v) {
+      setVentas(JSON.parse(v));
     }
 
   }, []);
@@ -172,25 +170,40 @@ export default function App() {
   // TOTALES
   // ======================================================
 
-  const totalTicket = ticket.reduce(
-    (acc, item) =>
-      acc +
-      item.precio * item.cantidad,
-    0
-  );
+  const totalTicket =
+    ticket.reduce(
+      (acc, item) =>
+        acc +
+        item.precio *
+          item.cantidad,
+      0
+    );
 
-  const totalCaja = ventas.reduce(
-    (acc, venta) =>
-      acc + venta.total,
-    0
-  );
+  const totalCaja =
+    ventas.reduce(
+      (acc, venta) =>
+        acc + venta.total,
+      0
+    );
+
+  const totalProductosVendidos =
+    ventas.reduce(
+      (acc, venta) =>
+        acc +
+        venta.productos.reduce(
+          (a, p) =>
+            a + p.cantidad,
+          0
+        ),
+      0
+    );
 
   const cambio =
     Number(montoRecibido || 0) -
     totalTicket;
 
   // ======================================================
-  // AGREGAR PRODUCTO
+  // PRODUCTOS
   // ======================================================
 
   function agregarProducto() {
@@ -223,11 +236,8 @@ export default function App() {
     setNuevoCategoria("");
 
     setMostrarNuevo(false);
-  }
 
-  // ======================================================
-  // AGREGAR TICKET
-  // ======================================================
+  }
 
   function agregarAlTicket(
     producto: Producto
@@ -238,9 +248,11 @@ export default function App() {
       return;
     }
 
-    const existe = ticket.find(
-      (t) => t.id === producto.id
-    );
+    const existe =
+      ticket.find(
+        (t) =>
+          t.id === producto.id
+      );
 
     if (existe) {
 
@@ -262,8 +274,10 @@ export default function App() {
         ...ticket,
         {
           id: producto.id,
-          nombre: producto.nombre,
-          precio: producto.precio,
+          nombre:
+            producto.nombre,
+          precio:
+            producto.precio,
           cantidad: 1,
         },
       ]);
@@ -273,7 +287,7 @@ export default function App() {
   }
 
   // ======================================================
-  // PRODUCTO MANUAL
+  // MANUAL
   // ======================================================
 
   function agregarProductoManual() {
@@ -287,18 +301,21 @@ export default function App() {
       ...ticket,
       {
         id: Date.now(),
-        nombre: productoManual,
-        precio: Number(precioManual),
+        nombre:
+          productoManual,
+        precio:
+          Number(precioManual),
         cantidad: 1,
       },
     ]);
 
     setProductoManual("");
     setPrecioManual("");
+
   }
 
   // ======================================================
-  // NUEVA VENTA
+  // VENTA
   // ======================================================
 
   function nuevaVenta() {
@@ -308,10 +325,6 @@ export default function App() {
     setTelefonoCliente("");
 
   }
-
-  // ======================================================
-  // FINALIZAR
-  // ======================================================
 
   function finalizarVenta(
     metodo: string
@@ -327,8 +340,10 @@ export default function App() {
       fecha:
         new Date().toLocaleString(),
       metodo,
-      total: totalTicket,
-      productos: ticket,
+      total:
+        totalTicket,
+      productos:
+        ticket,
     };
 
     setVentas([
@@ -341,10 +356,13 @@ export default function App() {
 
         const vendido =
           ticket.find(
-            (t) => t.id === p.id
+            (t) =>
+              t.id === p.id
           );
 
-        if (!vendido) return p;
+        if (!vendido) {
+          return p;
+        }
 
         return {
           ...p,
@@ -370,12 +388,15 @@ export default function App() {
   function enviarWhatsApp() {
 
     if (!telefonoCliente) {
-      alert("Ingresar WhatsApp");
+      alert("Ingresar teléfono");
       return;
     }
 
     const numero =
-      telefonoCliente.replace(/\D/g, "");
+      telefonoCliente.replace(
+        /\D/g,
+        ""
+      );
 
     const detalle =
       ticket
@@ -397,7 +418,11 @@ Gracias ❤️`;
     const url =
       `https://wa.me/54${numero}?text=${encodeURIComponent(mensaje)}`;
 
-    window.open(url, "_blank");
+    window.open(
+      url,
+      "_blank"
+    );
+
   }
 
   // ======================================================
@@ -415,77 +440,105 @@ Gracias ❤️`;
 
     <div className="min-h-screen bg-gradient-to-br from-slate-100 via-white to-indigo-100">
 
-      <div className="bg-white shadow-xl p-5 flex justify-between items-center flex-wrap gap-4">
+      {/* HEADER */}
 
-        <div>
+      <div className="sticky top-0 z-50 bg-white/80 backdrop-blur-xl border-b shadow-lg">
 
-          <h1 className="text-4xl font-black text-slate-800">
-            NEGOCIO FÁCIL
-          </h1>
+        <div className="p-5 flex flex-wrap justify-between items-center gap-4">
 
-          <p className="text-gray-500">
-            Sistema POS
-          </p>
+          <div>
 
-        </div>
+            <h1 className="text-5xl font-black text-slate-800">
+              NEGOCIO FÁCIL
+            </h1>
 
-        <div className="bg-emerald-100 px-6 py-4 rounded-3xl">
+            <p className="text-gray-500 text-lg">
+              Sistema POS Premium
+            </p>
 
-          <p className="text-sm text-emerald-700">
-            Caja diaria
-          </p>
+          </div>
 
-          <h3 className="text-3xl font-black text-emerald-600">
-            ${totalCaja}
-          </h3>
+          <div className="flex flex-wrap gap-3">
+
+            <div className="bg-white rounded-3xl shadow-xl px-6 py-4">
+
+              <p className="text-gray-500 text-sm">
+                Caja diaria
+              </p>
+
+              <h3 className="text-3xl font-black text-emerald-500">
+                ${totalCaja}
+              </h3>
+
+            </div>
+
+            <div className="bg-white rounded-3xl shadow-xl px-6 py-4">
+
+              <p className="text-gray-500 text-sm">
+                Ventas
+              </p>
+
+              <h3 className="text-3xl font-black text-indigo-500">
+                {ventas.length}
+              </h3>
+
+            </div>
+
+            <div className="bg-white rounded-3xl shadow-xl px-6 py-4">
+
+              <p className="text-gray-500 text-sm">
+                Productos vendidos
+              </p>
+
+              <h3 className="text-3xl font-black text-pink-500">
+                {totalProductosVendidos}
+              </h3>
+
+            </div>
+
+          </div>
 
         </div>
 
       </div>
 
-      <div className="p-4 flex gap-3">
+      {/* NAV */}
 
-        <button
-          onClick={() =>
-            setVista("caja")
-          }
-          className={`px-5 py-3 rounded-2xl font-black ${
-            vista === "caja"
-              ? "bg-indigo-600 text-white"
-              : "bg-white"
-          }`}
-        >
-          Caja
-        </button>
+      <div className="p-4 flex flex-wrap gap-3">
 
-        <button
-          onClick={() =>
-            setVista("stock")
-          }
-          className={`px-5 py-3 rounded-2xl font-black ${
-            vista === "stock"
-              ? "bg-indigo-600 text-white"
-              : "bg-white"
-          }`}
-        >
-          Stock
-        </button>
+        {[
+          "dashboard",
+          "caja",
+          "stock",
+          "ventas",
+        ].map((item) => (
 
-        <button
-          onClick={() =>
-            setVista("ventas")
-          }
-          className={`px-5 py-3 rounded-2xl font-black ${
-            vista === "ventas"
-              ? "bg-indigo-600 text-white"
-              : "bg-white"
-          }`}
-        >
-          Ventas
-        </button>
+          <button
+            key={item}
+            onClick={() =>
+              setVista(
+                item as
+                  | "dashboard"
+                  | "caja"
+                  | "stock"
+                  | "ventas"
+              )
+            }
+            className={`px-6 py-4 rounded-2xl font-black transition-all ${
+              vista === item
+                ? "bg-indigo-600 text-white shadow-xl scale-105"
+                : "bg-white hover:scale-105"
+            }`}
+          >
+            {item}
+          </button>
+
+        ))}
 
       </div>
 
     </div>
+
   );
+
 }
