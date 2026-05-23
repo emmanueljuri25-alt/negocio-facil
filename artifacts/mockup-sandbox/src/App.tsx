@@ -7,14 +7,13 @@ export default function App() {
   // ======================================================
 
   type Producto = {
-    
     id: number;
     nombre: string;
     precio: number;
     stock: number;
     categoria: string;
   };
-  
+
   type TicketItem = {
     id: number;
     nombre: string;
@@ -157,7 +156,7 @@ export default function App() {
   }, [ventas]);
 
   // ======================================================
-  // FILTRO PRODUCTOS
+  // FILTRO
   // ======================================================
 
   const productosFiltrados =
@@ -195,7 +194,10 @@ export default function App() {
       (acc, venta) =>
         acc +
         venta.productos.reduce(
-            (a: number, p: TicketItem) =>
+          (
+            a: number,
+            p: TicketItem
+          ) =>
             a + p.cantidad,
           0
         ),
@@ -207,7 +209,7 @@ export default function App() {
     totalTicket;
 
   // ======================================================
-  // AGREGAR PRODUCTO
+  // FUNCIONES
   // ======================================================
 
   function agregarProducto() {
@@ -242,10 +244,6 @@ export default function App() {
     setMostrarNuevo(false);
   }
 
-  // ======================================================
-  // ELIMINAR PRODUCTO
-  // ======================================================
-
   function eliminarProducto(id: number) {
 
     const confirmar =
@@ -262,10 +260,6 @@ export default function App() {
     );
 
   }
-
-  // ======================================================
-  // STOCK RAPIDO
-  // ======================================================
 
   function sumarStock(id: number) {
 
@@ -297,10 +291,6 @@ export default function App() {
     );
 
   }
-
-  // ======================================================
-  // AGREGAR AL TICKET
-  // ======================================================
 
   function agregarAlTicket(
     producto: Producto
@@ -343,10 +333,6 @@ export default function App() {
 
   }
 
-  // ======================================================
-  // PRODUCTO MANUAL
-  // ======================================================
-
   function agregarProductoManual() {
 
     if (
@@ -354,7 +340,7 @@ export default function App() {
       !precioManual
     ) return;
 
-      const nuevo: TicketItem = {
+    const nuevo: TicketItem = {
       id: Date.now(),
       nombre: productoManual,
       precio: Number(precioManual),
@@ -371,10 +357,6 @@ export default function App() {
     setPrecioManual("");
   }
 
-  // ======================================================
-  // NUEVA VENTA
-  // ======================================================
-
   function nuevaVenta() {
 
     setTicket([]);
@@ -382,10 +364,6 @@ export default function App() {
     setTelefonoCliente("");
 
   }
-
-  // ======================================================
-  // FINALIZAR
-  // ======================================================
 
   function finalizarVenta(
     metodo: string
@@ -396,7 +374,7 @@ export default function App() {
       return;
     }
 
-      const venta: Venta = {
+    const venta: Venta = {
       id: Date.now(),
       fecha:
         new Date().toLocaleString(),
@@ -409,8 +387,6 @@ export default function App() {
       venta,
       ...ventas,
     ]);
-
-    // DESCONTAR STOCK
 
     const actualizados =
       productos.map((p) => {
@@ -438,10 +414,6 @@ export default function App() {
     alert("Venta realizada");
 
   }
-
-  // ======================================================
-  // WHATSAPP
-  // ======================================================
 
   function enviarWhatsApp() {
 
@@ -489,21 +461,27 @@ Gracias ❤️`;
 
   return (
 
-    <div className="min-h-screen bg-gradient-to-br from-slate-100 via-white to-indigo-100">
+    <div className="min-h-screen bg-[#0b1120] text-white overflow-hidden relative">
+
+      {/* EFECTOS FONDO */}
+
+      <div className="absolute top-0 left-0 w-[500px] h-[500px] bg-fuchsia-600/30 blur-[120px] rounded-full" />
+
+      <div className="absolute bottom-0 right-0 w-[500px] h-[500px] bg-cyan-500/30 blur-[120px] rounded-full" />
 
       {/* HEADER */}
 
-      <div className="sticky top-0 z-50 backdrop-blur-xl bg-white/80 border-b border-white/20 shadow-lg">
+      <div className="sticky top-0 z-50 backdrop-blur-2xl bg-white/10 border-b border-white/10 shadow-2xl">
 
         <div className="p-4 flex flex-wrap gap-4 items-center justify-between">
 
           <div>
 
-            <h1 className="text-4xl font-black text-slate-800">
+            <h1 className="text-5xl font-black bg-gradient-to-r from-fuchsia-400 to-cyan-400 bg-clip-text text-transparent tracking-tight">
               NEGOCIO FÁCIL
             </h1>
 
-            <p className="text-gray-500">
+            <p className="text-gray-300">
               Premium POS
             </p>
 
@@ -513,37 +491,37 @@ Gracias ❤️`;
 
           <div className="flex flex-wrap gap-3">
 
-            <div className="bg-white rounded-2xl p-4 shadow-lg min-w-[140px]">
+            <div className="bg-white/10 backdrop-blur-xl border border-white/10 rounded-3xl p-4 shadow-2xl min-w-[160px]">
 
-              <p className="text-sm text-gray-500">
+              <p className="text-sm text-gray-300">
                 Caja diaria
               </p>
 
-              <h3 className="text-2xl font-black text-emerald-500">
+              <h3 className="text-3xl font-black text-emerald-400">
                 ${totalCaja}
               </h3>
 
             </div>
 
-            <div className="bg-white rounded-2xl p-4 shadow-lg min-w-[140px]">
+            <div className="bg-white/10 backdrop-blur-xl border border-white/10 rounded-3xl p-4 shadow-2xl min-w-[160px]">
 
-              <p className="text-sm text-gray-500">
+              <p className="text-sm text-gray-300">
                 Ventas
               </p>
 
-              <h3 className="text-2xl font-black text-indigo-500">
+              <h3 className="text-3xl font-black text-cyan-400">
                 {ventas.length}
               </h3>
 
             </div>
 
-            <div className="bg-white rounded-2xl p-4 shadow-lg min-w-[140px]">
+            <div className="bg-white/10 backdrop-blur-xl border border-white/10 rounded-3xl p-4 shadow-2xl min-w-[160px]">
 
-              <p className="text-sm text-gray-500">
+              <p className="text-sm text-gray-300">
                 Productos vendidos
               </p>
 
-              <h3 className="text-2xl font-black text-pink-500">
+              <h3 className="text-3xl font-black text-fuchsia-400">
                 {totalProductosVendidos}
               </h3>
 
@@ -557,16 +535,16 @@ Gracias ❤️`;
 
       {/* NAV */}
 
-      <div className="p-4 flex flex-wrap gap-3">
+      <div className="p-4 flex flex-wrap gap-3 relative z-10">
 
         <button
           onClick={() =>
             setVista("caja")
           }
-          className={`px-5 py-3 rounded-2xl font-black ${
+          className={`px-6 py-4 rounded-2xl font-black transition-all duration-300 ${
             vista === "caja"
-              ? "bg-indigo-600 text-white"
-              : "bg-white"
+              ? "bg-gradient-to-r from-fuchsia-600 to-cyan-500 text-white shadow-2xl"
+              : "bg-white/10 border border-white/10"
           }`}
         >
           Caja
@@ -576,10 +554,10 @@ Gracias ❤️`;
           onClick={() =>
             setVista("stock")
           }
-          className={`px-5 py-3 rounded-2xl font-black ${
+          className={`px-6 py-4 rounded-2xl font-black transition-all duration-300 ${
             vista === "stock"
-              ? "bg-indigo-600 text-white"
-              : "bg-white"
+              ? "bg-gradient-to-r from-fuchsia-600 to-cyan-500 text-white shadow-2xl"
+              : "bg-white/10 border border-white/10"
           }`}
         >
           Stock
@@ -589,10 +567,10 @@ Gracias ❤️`;
           onClick={() =>
             setVista("ventas")
           }
-          className={`px-5 py-3 rounded-2xl font-black ${
+          className={`px-6 py-4 rounded-2xl font-black transition-all duration-300 ${
             vista === "ventas"
-              ? "bg-indigo-600 text-white"
-              : "bg-white"
+              ? "bg-gradient-to-r from-fuchsia-600 to-cyan-500 text-white shadow-2xl"
+              : "bg-white/10 border border-white/10"
           }`}
         >
           Ventas
@@ -600,21 +578,17 @@ Gracias ❤️`;
 
       </div>
 
-      {/* ======================================================
-      CAJA
-      ====================================================== */}
+      {/* CAJA */}
 
       {vista === "caja" && (
 
-        <div className="grid grid-cols-1 xl:grid-cols-3 gap-4 p-4">
+        <div className="grid grid-cols-1 xl:grid-cols-3 gap-5 p-4 relative z-10">
 
           {/* PRODUCTOS */}
 
           <div className="xl:col-span-2">
 
-            {/* BUSCADOR */}
-
-            <div className="bg-white rounded-3xl p-4 shadow-xl mb-4">
+            <div className="bg-white/10 backdrop-blur-xl border border-white/10 rounded-3xl p-4 shadow-2xl mb-5">
 
               <input
                 placeholder="Buscar producto..."
@@ -624,12 +598,10 @@ Gracias ❤️`;
                     e.target.value
                   )
                 }
-                className="w-full bg-slate-100 rounded-2xl p-5 text-xl outline-none"
+                className="w-full bg-white/10 border border-white/10 text-white placeholder:text-gray-400 rounded-2xl p-5 text-xl outline-none focus:border-fuchsia-500"
               />
 
             </div>
-
-            {/* PRODUCTOS */}
 
             <div className="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-4">
 
@@ -646,16 +618,16 @@ Gracias ❤️`;
                         producto
                       )
                     }
-                    className={`rounded-3xl p-4 text-left shadow-xl transition-all ${
+                    className={`rounded-3xl p-5 text-left transition-all duration-300 border ${
                       producto.stock <= 0
-                        ? "bg-gray-300 opacity-60"
-                        : "bg-white hover:scale-105"
+                        ? "bg-gray-500/20 opacity-50 border-white/5"
+                        : "bg-white/10 backdrop-blur-xl border-white/10 hover:scale-[1.03] hover:border-fuchsia-500/40 hover:shadow-fuchsia-500/20 hover:shadow-2xl"
                     }`}
                   >
 
                     <div className="flex justify-between">
 
-                      <span className="bg-indigo-100 text-indigo-700 text-xs font-bold px-3 py-1 rounded-full">
+                      <span className="bg-fuchsia-500/20 text-fuchsia-300 text-xs font-bold px-3 py-1 rounded-full">
                         {
                           producto.categoria
                         }
@@ -665,7 +637,7 @@ Gracias ❤️`;
                         className={`text-xs font-bold px-3 py-1 rounded-full text-white ${
                           producto.stock <= 3
                             ? "bg-red-500"
-                            : "bg-green-500"
+                            : "bg-emerald-500"
                         }`}
                       >
                         {
@@ -685,7 +657,7 @@ Gracias ❤️`;
                         }
                       </h3>
 
-                      <p className="text-4xl font-black text-indigo-600 mt-3">
+                      <p className="text-4xl font-black bg-gradient-to-r from-fuchsia-400 to-cyan-400 bg-clip-text text-transparent mt-3">
                         $
                         {
                           producto.precio
@@ -705,7 +677,7 @@ Gracias ❤️`;
 
           {/* TICKET */}
 
-          <div className="bg-slate-900 text-white rounded-3xl p-5 shadow-2xl sticky top-28 h-fit">
+          <div className="bg-black/40 backdrop-blur-2xl border border-white/10 text-white rounded-3xl p-5 shadow-[0_0_60px_rgba(168,85,247,0.25)] sticky top-28 h-fit">
 
             <div className="flex justify-between items-center">
 
@@ -715,7 +687,7 @@ Gracias ❤️`;
 
               <button
                 onClick={nuevaVenta}
-                className="bg-red-500 px-4 py-2 rounded-2xl font-bold"
+                className="bg-red-500 hover:bg-red-400 transition-all px-4 py-2 rounded-2xl font-bold"
               >
                 Nueva
               </button>
@@ -724,7 +696,7 @@ Gracias ❤️`;
 
             {/* MANUAL */}
 
-            <div className="bg-slate-800 rounded-3xl p-4 mt-5">
+            <div className="bg-white/5 border border-white/10 rounded-3xl p-4 mt-5">
 
               <h3 className="font-bold mb-3">
                 Producto manual
@@ -738,7 +710,7 @@ Gracias ❤️`;
                     e.target.value
                   )
                 }
-                className="w-full bg-white text-black p-4 rounded-2xl mb-3"
+                className="w-full bg-white/10 border border-white/10 text-white placeholder:text-gray-400 p-4 rounded-2xl mb-3 outline-none"
               />
 
               <input
@@ -750,14 +722,14 @@ Gracias ❤️`;
                     e.target.value
                   )
                 }
-                className="w-full bg-white text-black p-4 rounded-2xl"
+                className="w-full bg-white/10 border border-white/10 text-white placeholder:text-gray-400 p-4 rounded-2xl outline-none"
               />
 
               <button
                 onClick={
                   agregarProductoManual
                 }
-                className="w-full bg-indigo-600 p-4 rounded-2xl mt-3 font-black"
+                className="w-full bg-gradient-to-r from-fuchsia-600 to-cyan-500 p-4 rounded-2xl mt-3 font-black hover:scale-[1.02] transition-all"
               >
                 Agregar
               </button>
@@ -772,7 +744,7 @@ Gracias ❤️`;
 
                 <div
                   key={item.id}
-                  className="bg-slate-800 rounded-2xl p-4 flex justify-between"
+                  className="bg-white/5 border border-white/10 rounded-2xl p-4 flex justify-between"
                 >
 
                   <div>
@@ -781,21 +753,17 @@ Gracias ❤️`;
                       {item.nombre}
                     </h3>
 
-                    <p className="text-slate-400">
+                    <p className="text-gray-400">
                       x{item.cantidad}
                     </p>
 
                   </div>
 
-                  <div>
-
-                    <p className="text-2xl font-black">
-                      $
-                      {item.precio *
-                        item.cantidad}
-                    </p>
-
-                  </div>
+                  <p className="text-2xl font-black text-cyan-300">
+                    $
+                    {item.precio *
+                      item.cantidad}
+                  </p>
 
                 </div>
 
@@ -805,408 +773,19 @@ Gracias ❤️`;
 
             {/* TOTAL */}
 
-            <div className="bg-slate-800 rounded-3xl p-5 mt-5">
+            <div className="bg-white/5 border border-white/10 rounded-3xl p-5 mt-5">
 
-              <div className="flex justify-between">
+              <div className="flex justify-between items-center">
 
-                <span className="text-slate-400">
+                <span className="text-gray-400">
                   TOTAL
                 </span>
 
-                <span className="text-5xl font-black text-emerald-400">
+                <span className="text-6xl font-black bg-gradient-to-r from-emerald-400 to-cyan-400 bg-clip-text text-transparent">
                   ${totalTicket}
                 </span>
 
               </div>
-
-            </div>
-
-            {/* EFECTIVO */}
-
-            <div className="bg-slate-800 rounded-3xl p-5 mt-5">
-
-              <input
-                type="number"
-                placeholder="Dinero recibido"
-                value={montoRecibido}
-                onChange={(e) =>
-                  setMontoRecibido(
-                    e.target.value
-                  )
-                }
-                className="w-full bg-white text-black p-4 rounded-2xl text-2xl font-black"
-              />
-
-              <div className="flex justify-between mt-5">
-
-                <span className="text-slate-400">
-                  Cambio
-                </span>
-
-                <span className="text-4xl font-black text-emerald-400">
-                  $
-                  {cambio > 0
-                    ? cambio
-                    : 0}
-                </span>
-
-              </div>
-
-            </div>
-
-            {/* BOTONES */}
-
-            <div className="grid grid-cols-2 gap-3 mt-5">
-
-              <button
-                onClick={() =>
-                  finalizarVenta(
-                    "Efectivo"
-                  )
-                }
-                className="bg-emerald-500 p-5 rounded-3xl font-black text-xl"
-              >
-                Efectivo
-              </button>
-
-              <button
-                onClick={() =>
-                  finalizarVenta(
-                    "Transferencia"
-                  )
-                }
-                className="bg-indigo-500 p-5 rounded-3xl font-black text-xl"
-              >
-                Transferencia
-              </button>
-
-              <button
-                onClick={() =>
-                  finalizarVenta(
-                    "QR"
-                  )
-                }
-                className="bg-cyan-500 p-5 rounded-3xl font-black text-xl"
-              >
-                QR
-              </button>
-
-              <button
-                onClick={() =>
-                  window.print()
-                }
-                className="bg-pink-500 p-5 rounded-3xl font-black text-xl"
-              >
-                Imprimir
-              </button>
-
-            </div>
-
-            {/* QR */}
-
-            <div className="bg-white rounded-3xl p-5 mt-5">
-
-              <img
-                src={qr}
-                alt="QR"
-                className="w-full rounded-2xl"
-              />
-
-            </div>
-
-            {/* WHATSAPP */}
-
-            <div className="mt-5">
-
-              <input
-                placeholder="WhatsApp cliente"
-                value={
-                  telefonoCliente
-                }
-                onChange={(e) =>
-                  setTelefonoCliente(
-                    e.target.value
-                  )
-                }
-                className="w-full bg-white text-black p-4 rounded-2xl"
-              />
-
-              <button
-                onClick={
-                  enviarWhatsApp
-                }
-                className="w-full bg-green-500 p-5 rounded-3xl mt-3 font-black text-xl"
-              >
-                Enviar WhatsApp
-              </button>
-
-            </div>
-
-          </div>
-
-        </div>
-
-      )}
-
-      {/* ======================================================
-      STOCK
-      ====================================================== */}
-
-      {vista === "stock" && (
-
-        <div className="p-4">
-
-          <div className="bg-white rounded-3xl p-6 shadow-2xl">
-
-            <div className="flex justify-between items-center flex-wrap gap-4">
-
-              <h2 className="text-4xl font-black">
-                Stock
-              </h2>
-
-              <button
-                onClick={() =>
-                  setMostrarNuevo(
-                    true
-                  )
-                }
-                className="bg-indigo-600 text-white px-6 py-4 rounded-2xl text-xl font-black"
-              >
-                + Producto
-              </button>
-
-            </div>
-
-            <div className="space-y-4 mt-6">
-
-              {productos.map(
-                (producto) => (
-
-                  <div
-                    key={producto.id}
-                    className="bg-slate-100 rounded-3xl p-5"
-                  >
-
-                    <div className="flex justify-between items-center flex-wrap gap-4">
-
-                      <div>
-
-                        <h3 className="text-2xl font-black">
-                          {
-                            producto.nombre
-                          }
-                        </h3>
-
-                        <p className="text-gray-500">
-                          {
-                            producto.categoria
-                          }
-                        </p>
-
-                      </div>
-
-                      <div className="flex gap-2 items-center">
-
-                        <button
-                          onClick={() =>
-                            restarStock(
-                              producto.id
-                            )
-                          }
-                          className="bg-red-500 text-white w-10 h-10 rounded-xl font-black"
-                        >
-                          -
-                        </button>
-
-                        <div className="bg-white px-5 py-3 rounded-2xl font-black text-xl">
-                          {
-                            producto.stock
-                          }
-                        </div>
-
-                        <button
-                          onClick={() =>
-                            sumarStock(
-                              producto.id
-                            )
-                          }
-                          className="bg-green-500 text-white w-10 h-10 rounded-xl font-black"
-                        >
-                          +
-                        </button>
-
-                      </div>
-
-                      <div>
-
-                        <p className="text-3xl font-black text-indigo-600">
-                          $
-                          {
-                            producto.precio
-                          }
-                        </p>
-
-                      </div>
-
-                      <button
-                        onClick={() =>
-                          eliminarProducto(
-                            producto.id
-                          )
-                        }
-                        className="bg-red-500 text-white px-5 py-3 rounded-2xl font-bold"
-                      >
-                        Eliminar
-                      </button>
-
-                    </div>
-
-                  </div>
-
-                )
-              )}
-
-            </div>
-
-          </div>
-
-        </div>
-
-      )}
-
-      {/* ======================================================
-      VENTAS
-      ====================================================== */}
-
-      {vista === "ventas" && (
-
-        <div className="p-4 space-y-4">
-
-          {ventas.map((venta) => (
-
-            <div
-              key={venta.id}
-              className="bg-white rounded-3xl p-5 shadow-xl"
-            >
-
-              <div className="flex justify-between flex-wrap gap-4">
-
-                <div>
-
-                  <h3 className="text-2xl font-black">
-                    {venta.metodo}
-                  </h3>
-
-                  <p className="text-gray-500">
-                    {venta.fecha}
-                  </p>
-
-                </div>
-
-                <div>
-
-                  <p className="text-4xl font-black text-indigo-600">
-                    $
-                    {venta.total}
-                  </p>
-
-                </div>
-
-              </div>
-
-            </div>
-
-          ))}
-
-        </div>
-
-      )}
-
-      {/* ======================================================
-      MODAL PRODUCTO
-      ====================================================== */}
-
-      {mostrarNuevo && (
-
-        <div className="fixed inset-0 bg-black/40 flex items-center justify-center p-4 z-50">
-
-          <div className="bg-white rounded-3xl p-6 w-full max-w-md">
-
-            <h2 className="text-3xl font-black mb-5">
-              Nuevo producto
-            </h2>
-
-            <div className="space-y-4">
-
-              <input
-                placeholder="Nombre"
-                value={nuevoNombre}
-                onChange={(e) =>
-                  setNuevoNombre(
-                    e.target.value
-                  )
-                }
-                className="w-full border p-4 rounded-2xl"
-              />
-
-              <input
-                placeholder="Categoría"
-                value={nuevoCategoria}
-                onChange={(e) =>
-                  setNuevoCategoria(
-                    e.target.value
-                  )
-                }
-                className="w-full border p-4 rounded-2xl"
-              />
-
-              <input
-                type="number"
-                placeholder="Precio"
-                value={nuevoPrecio}
-                onChange={(e) =>
-                  setNuevoPrecio(
-                    e.target.value
-                  )
-                }
-                className="w-full border p-4 rounded-2xl"
-              />
-
-              <input
-                type="number"
-                placeholder="Stock"
-                value={nuevoStock}
-                onChange={(e) =>
-                  setNuevoStock(
-                    e.target.value
-                  )
-                }
-                className="w-full border p-4 rounded-2xl"
-              />
-
-            </div>
-
-            <div className="grid grid-cols-2 gap-3 mt-6">
-
-              <button
-                onClick={() =>
-                  setMostrarNuevo(
-                    false
-                  )
-                }
-                className="bg-gray-200 p-4 rounded-2xl font-bold"
-              >
-                Cancelar
-              </button>
-
-              <button
-                onClick={
-                  agregarProducto
-                }
-                className="bg-indigo-600 text-white p-4 rounded-2xl font-bold"
-              >
-                Guardar
-              </button>
 
             </div>
 
