@@ -58,10 +58,6 @@ export default function App() {
   const [busqueda, setBusqueda] =
     useState("");
 
-  // ======================================================
-  // NUEVO PRODUCTO
-  // ======================================================
-
   const [mostrarNuevo, setMostrarNuevo] =
     useState(false);
 
@@ -76,10 +72,6 @@ export default function App() {
 
   const [nuevoCategoria, setNuevoCategoria] =
     useState("");
-
-  // ======================================================
-  // PRODUCTO MANUAL
-  // ======================================================
 
   const [productoManual, setProductoManual] =
     useState("");
@@ -156,7 +148,7 @@ export default function App() {
   }, [ventas]);
 
   // ======================================================
-  // FILTRO
+  // FILTROS
   // ======================================================
 
   const productosFiltrados =
@@ -242,14 +234,13 @@ export default function App() {
     setNuevoCategoria("");
 
     setMostrarNuevo(false);
+
   }
 
   function eliminarProducto(id: number) {
 
     const confirmar =
-      confirm(
-        "Eliminar producto?"
-      );
+      confirm("Eliminar producto?");
 
     if (!confirmar) return;
 
@@ -355,6 +346,7 @@ export default function App() {
 
     setProductoManual("");
     setPrecioManual("");
+
   }
 
   function nuevaVenta() {
@@ -446,11 +438,8 @@ Gracias ❤️`;
       `https://wa.me/54${numero}?text=${encodeURIComponent(mensaje)}`;
 
     window.open(url, "_blank");
-  }
 
-  // ======================================================
-  // QR
-  // ======================================================
+  }
 
   const qr =
     `https://api.qrserver.com/v1/create-qr-code/?size=250x250&data=TOTAL:${totalTicket}`;
@@ -461,71 +450,98 @@ Gracias ❤️`;
 
   return (
 
-    <div className="min-h-screen bg-[#0b1120] text-white overflow-hidden relative">
+    <div className="min-h-screen bg-[#050816] text-white flex overflow-hidden">
 
-      {/* EFECTOS FONDO */}
+      {/* SIDEBAR */}
 
-      <div className="absolute top-0 left-0 w-[500px] h-[500px] bg-fuchsia-600/30 blur-[120px] rounded-full" />
+      <div className="w-[260px] bg-white/5 border-r border-white/10 backdrop-blur-2xl p-6 hidden lg:flex flex-col justify-between">
 
-      <div className="absolute bottom-0 right-0 w-[500px] h-[500px] bg-cyan-500/30 blur-[120px] rounded-full" />
+        <div>
 
-      {/* HEADER */}
+          <div className="mb-10">
 
-      <div className="sticky top-0 z-50 backdrop-blur-2xl bg-white/10 border-b border-white/10 shadow-2xl">
-
-        <div className="p-4 flex flex-wrap gap-4 items-center justify-between">
-
-          <div>
-
-            <h1 className="text-5xl font-black bg-gradient-to-r from-fuchsia-400 to-cyan-400 bg-clip-text text-transparent tracking-tight">
-              NEGOCIO FÁCIL
+            <h1 className="text-4xl font-black bg-gradient-to-r from-fuchsia-500 to-cyan-400 bg-clip-text text-transparent">
+              NEGOCIO
             </h1>
 
-            <p className="text-gray-300">
+            <h2 className="text-4xl font-black text-white -mt-2">
+              FÁCIL
+            </h2>
+
+            <p className="text-gray-400 mt-2">
               Premium POS
             </p>
 
           </div>
 
-          {/* DASHBOARD */}
+          <div className="space-y-4">
 
-          <div className="flex flex-wrap gap-3">
+            <button
+              onClick={() =>
+                setVista("caja")
+              }
+              className={`w-full text-left px-5 py-4 rounded-2xl font-bold transition-all ${
+                vista === "caja"
+                  ? "bg-gradient-to-r from-fuchsia-600 to-cyan-500 shadow-2xl"
+                  : "bg-white/5 hover:bg-white/10"
+              }`}
+            >
+              🛒 Caja
+            </button>
 
-            <div className="bg-white/10 backdrop-blur-xl border border-white/10 rounded-3xl p-4 shadow-2xl min-w-[160px]">
+            <button
+              onClick={() =>
+                setVista("stock")
+              }
+              className={`w-full text-left px-5 py-4 rounded-2xl font-bold transition-all ${
+                vista === "stock"
+                  ? "bg-gradient-to-r from-fuchsia-600 to-cyan-500 shadow-2xl"
+                  : "bg-white/5 hover:bg-white/10"
+              }`}
+            >
+              📦 Stock
+            </button>
 
-              <p className="text-sm text-gray-300">
-                Caja diaria
-              </p>
+            <button
+              onClick={() =>
+                setVista("ventas")
+              }
+              className={`w-full text-left px-5 py-4 rounded-2xl font-bold transition-all ${
+                vista === "ventas"
+                  ? "bg-gradient-to-r from-fuchsia-600 to-cyan-500 shadow-2xl"
+                  : "bg-white/5 hover:bg-white/10"
+              }`}
+            >
+              💰 Ventas
+            </button>
 
-              <h3 className="text-3xl font-black text-emerald-400">
-                ${totalCaja}
-              </h3>
+          </div>
 
-            </div>
+        </div>
 
-            <div className="bg-white/10 backdrop-blur-xl border border-white/10 rounded-3xl p-4 shadow-2xl min-w-[160px]">
+        <div className="space-y-4">
 
-              <p className="text-sm text-gray-300">
-                Ventas
-              </p>
+          <div className="bg-white/5 rounded-3xl p-5 border border-white/10">
 
-              <h3 className="text-3xl font-black text-cyan-400">
-                {ventas.length}
-              </h3>
+            <p className="text-gray-400 text-sm">
+              Caja diaria
+            </p>
 
-            </div>
+            <h3 className="text-4xl font-black text-emerald-400 mt-2">
+              ${totalCaja}
+            </h3>
 
-            <div className="bg-white/10 backdrop-blur-xl border border-white/10 rounded-3xl p-4 shadow-2xl min-w-[160px]">
+          </div>
 
-              <p className="text-sm text-gray-300">
-                Productos vendidos
-              </p>
+          <div className="bg-white/5 rounded-3xl p-5 border border-white/10">
 
-              <h3 className="text-3xl font-black text-fuchsia-400">
-                {totalProductosVendidos}
-              </h3>
+            <p className="text-gray-400 text-sm">
+              Productos vendidos
+            </p>
 
-            </div>
+            <h3 className="text-4xl font-black text-cyan-400 mt-2">
+              {totalProductosVendidos}
+            </h3>
 
           </div>
 
@@ -533,257 +549,328 @@ Gracias ❤️`;
 
       </div>
 
-      {/* NAV */}
+      {/* MAIN */}
 
-      <div className="p-4 flex flex-wrap gap-3 relative z-10">
+      <div className="flex-1 overflow-auto">
 
-        <button
-          onClick={() =>
-            setVista("caja")
-          }
-          className={`px-6 py-4 rounded-2xl font-black transition-all duration-300 ${
-            vista === "caja"
-              ? "bg-gradient-to-r from-fuchsia-600 to-cyan-500 text-white shadow-2xl"
-              : "bg-white/10 border border-white/10"
-          }`}
-        >
-          Caja
-        </button>
+        {/* MOBILE NAV */}
 
-        <button
-          onClick={() =>
-            setVista("stock")
-          }
-          className={`px-6 py-4 rounded-2xl font-black transition-all duration-300 ${
-            vista === "stock"
-              ? "bg-gradient-to-r from-fuchsia-600 to-cyan-500 text-white shadow-2xl"
-              : "bg-white/10 border border-white/10"
-          }`}
-        >
-          Stock
-        </button>
+        <div className="lg:hidden p-4 flex gap-3">
 
-        <button
-          onClick={() =>
-            setVista("ventas")
-          }
-          className={`px-6 py-4 rounded-2xl font-black transition-all duration-300 ${
-            vista === "ventas"
-              ? "bg-gradient-to-r from-fuchsia-600 to-cyan-500 text-white shadow-2xl"
-              : "bg-white/10 border border-white/10"
-          }`}
-        >
-          Ventas
-        </button>
+          <button
+            onClick={() =>
+              setVista("caja")
+            }
+            className="bg-fuchsia-600 px-4 py-3 rounded-2xl font-bold"
+          >
+            Caja
+          </button>
 
-      </div>
+          <button
+            onClick={() =>
+              setVista("stock")
+            }
+            className="bg-cyan-600 px-4 py-3 rounded-2xl font-bold"
+          >
+            Stock
+          </button>
 
-      {/* CAJA */}
+          <button
+            onClick={() =>
+              setVista("ventas")
+            }
+            className="bg-emerald-600 px-4 py-3 rounded-2xl font-bold"
+          >
+            Ventas
+          </button>
 
-      {vista === "caja" && (
+        </div>
 
-        <div className="grid grid-cols-1 xl:grid-cols-3 gap-5 p-4 relative z-10">
+        {/* CAJA */}
 
-          {/* PRODUCTOS */}
+        {vista === "caja" && (
 
-          <div className="xl:col-span-2">
+          <div className="grid grid-cols-1 xl:grid-cols-3 gap-5 p-5">
 
-            <div className="bg-white/10 backdrop-blur-xl border border-white/10 rounded-3xl p-4 shadow-2xl mb-5">
+            {/* PRODUCTOS */}
 
-              <input
-                placeholder="Buscar producto..."
-                value={busqueda}
-                onChange={(e) =>
-                  setBusqueda(
-                    e.target.value
-                  )
-                }
-                className="w-full bg-white/10 border border-white/10 text-white placeholder:text-gray-400 rounded-2xl p-5 text-xl outline-none focus:border-fuchsia-500"
-              />
+            <div className="xl:col-span-2">
 
-            </div>
+              <div className="bg-white/5 border border-white/10 backdrop-blur-2xl rounded-3xl p-5 mb-5">
 
-            <div className="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-4">
+                <input
+                  placeholder="Buscar producto..."
+                  value={busqueda}
+                  onChange={(e) =>
+                    setBusqueda(
+                      e.target.value
+                    )
+                  }
+                  className="w-full bg-[#0f172a] border border-white/10 rounded-2xl p-5 text-xl outline-none"
+                />
 
-              {productosFiltrados.map(
-                (producto) => (
+              </div>
 
-                  <button
-                    key={producto.id}
-                    disabled={
-                      producto.stock <= 0
-                    }
-                    onClick={() =>
-                      agregarAlTicket(
-                        producto
-                      )
-                    }
-                    className={`rounded-3xl p-5 text-left transition-all duration-300 border ${
-                      producto.stock <= 0
-                        ? "bg-gray-500/20 opacity-50 border-white/5"
-                        : "bg-white/10 backdrop-blur-xl border-white/10 hover:scale-[1.03] hover:border-fuchsia-500/40 hover:shadow-fuchsia-500/20 hover:shadow-2xl"
-                    }`}
-                  >
+              <div className="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-4">
 
-                    <div className="flex justify-between">
+                {productosFiltrados.map(
+                  (producto) => (
 
-                      <span className="bg-fuchsia-500/20 text-fuchsia-300 text-xs font-bold px-3 py-1 rounded-full">
-                        {
-                          producto.categoria
-                        }
-                      </span>
+                    <button
+                      key={producto.id}
+                      disabled={
+                        producto.stock <= 0
+                      }
+                      onClick={() =>
+                        agregarAlTicket(
+                          producto
+                        )
+                      }
+                      className={`rounded-3xl p-5 text-left border transition-all duration-300 ${
+                        producto.stock <= 0
+                          ? "bg-gray-700/30 opacity-50 border-white/5"
+                          : "bg-white/5 border-white/10 hover:scale-105 hover:border-fuchsia-500/40 hover:bg-white/10"
+                      }`}
+                    >
 
-                      <span
-                        className={`text-xs font-bold px-3 py-1 rounded-full text-white ${
+                      <div className="flex justify-between items-center">
+
+                        <span className="bg-fuchsia-500/20 text-fuchsia-300 text-xs font-bold px-3 py-1 rounded-full">
+                          {
+                            producto.categoria
+                          }
+                        </span>
+
+                        <span className={`text-xs font-bold px-3 py-1 rounded-full ${
                           producto.stock <= 3
                             ? "bg-red-500"
                             : "bg-emerald-500"
-                        }`}
-                      >
-                        {
-                          producto.stock <= 0
-                            ? "AGOTADO"
-                            : producto.stock
-                        }
-                      </span>
+                        }`}>
+                          {
+                            producto.stock <= 0
+                              ? "AGOTADO"
+                              : producto.stock
+                          }
+                        </span>
 
-                    </div>
+                      </div>
 
-                    <div className="mt-6">
+                      <div className="mt-6">
 
-                      <h3 className="font-black text-xl">
-                        {
-                          producto.nombre
-                        }
+                        <h3 className="font-black text-xl">
+                          {
+                            producto.nombre
+                          }
+                        </h3>
+
+                        <p className="text-4xl font-black mt-4 bg-gradient-to-r from-fuchsia-400 to-cyan-400 bg-clip-text text-transparent">
+                          $
+                          {
+                            producto.precio
+                          }
+                        </p>
+
+                      </div>
+
+                    </button>
+
+                  )
+                )}
+
+              </div>
+
+            </div>
+
+            {/* TICKET */}
+
+            <div className="bg-white/5 border border-white/10 backdrop-blur-2xl rounded-3xl p-5 h-fit sticky top-5">
+
+              <div className="flex justify-between items-center">
+
+                <h2 className="text-4xl font-black">
+                  Ticket
+                </h2>
+
+                <button
+                  onClick={nuevaVenta}
+                  className="bg-red-500 px-4 py-2 rounded-2xl font-bold"
+                >
+                  Nueva
+                </button>
+
+              </div>
+
+              {/* ITEMS */}
+
+              <div className="space-y-3 mt-5 max-h-[320px] overflow-auto">
+
+                {ticket.map((item) => (
+
+                  <div
+                    key={item.id}
+                    className="bg-[#111827] rounded-2xl p-4 flex justify-between"
+                  >
+
+                    <div>
+
+                      <h3 className="font-bold">
+                        {item.nombre}
                       </h3>
 
-                      <p className="text-4xl font-black bg-gradient-to-r from-fuchsia-400 to-cyan-400 bg-clip-text text-transparent mt-3">
-                        $
-                        {
-                          producto.precio
-                        }
+                      <p className="text-gray-400">
+                        x{item.cantidad}
                       </p>
 
                     </div>
 
-                  </button>
-
-                )
-              )}
-
-            </div>
-
-          </div>
-
-          {/* TICKET */}
-
-          <div className="bg-black/40 backdrop-blur-2xl border border-white/10 text-white rounded-3xl p-5 shadow-[0_0_60px_rgba(168,85,247,0.25)] sticky top-28 h-fit">
-
-            <div className="flex justify-between items-center">
-
-              <h2 className="text-4xl font-black">
-                Ticket
-              </h2>
-
-              <button
-                onClick={nuevaVenta}
-                className="bg-red-500 hover:bg-red-400 transition-all px-4 py-2 rounded-2xl font-bold"
-              >
-                Nueva
-              </button>
-
-            </div>
-
-            {/* MANUAL */}
-
-            <div className="bg-white/5 border border-white/10 rounded-3xl p-4 mt-5">
-
-              <h3 className="font-bold mb-3">
-                Producto manual
-              </h3>
-
-              <input
-                placeholder="Producto"
-                value={productoManual}
-                onChange={(e) =>
-                  setProductoManual(
-                    e.target.value
-                  )
-                }
-                className="w-full bg-white/10 border border-white/10 text-white placeholder:text-gray-400 p-4 rounded-2xl mb-3 outline-none"
-              />
-
-              <input
-                type="number"
-                placeholder="Precio"
-                value={precioManual}
-                onChange={(e) =>
-                  setPrecioManual(
-                    e.target.value
-                  )
-                }
-                className="w-full bg-white/10 border border-white/10 text-white placeholder:text-gray-400 p-4 rounded-2xl outline-none"
-              />
-
-              <button
-                onClick={
-                  agregarProductoManual
-                }
-                className="w-full bg-gradient-to-r from-fuchsia-600 to-cyan-500 p-4 rounded-2xl mt-3 font-black hover:scale-[1.02] transition-all"
-              >
-                Agregar
-              </button>
-
-            </div>
-
-            {/* ITEMS */}
-
-            <div className="space-y-3 mt-5 max-h-[300px] overflow-auto">
-
-              {ticket.map((item) => (
-
-                <div
-                  key={item.id}
-                  className="bg-white/5 border border-white/10 rounded-2xl p-4 flex justify-between"
-                >
-
-                  <div>
-
-                    <h3 className="font-bold">
-                      {item.nombre}
-                    </h3>
-
-                    <p className="text-gray-400">
-                      x{item.cantidad}
+                    <p className="text-2xl font-black text-cyan-400">
+                      $
+                      {item.precio *
+                        item.cantidad}
                     </p>
 
                   </div>
 
-                  <p className="text-2xl font-black text-cyan-300">
-                    $
-                    {item.precio *
-                      item.cantidad}
-                  </p>
+                ))}
+
+              </div>
+
+              {/* TOTAL */}
+
+              <div className="bg-[#111827] rounded-3xl p-5 mt-5">
+
+                <div className="flex justify-between items-center">
+
+                  <span className="text-gray-400">
+                    TOTAL
+                  </span>
+
+                  <span className="text-5xl font-black text-emerald-400">
+                    ${totalTicket}
+                  </span>
 
                 </div>
 
-              ))}
+              </div>
 
-            </div>
+              {/* EFECTIVO */}
 
-            {/* TOTAL */}
+              <div className="bg-[#111827] rounded-3xl p-5 mt-5">
 
-            <div className="bg-white/5 border border-white/10 rounded-3xl p-5 mt-5">
+                <input
+                  type="number"
+                  placeholder="Dinero recibido"
+                  value={montoRecibido}
+                  onChange={(e) =>
+                    setMontoRecibido(
+                      e.target.value
+                    )
+                  }
+                  className="w-full bg-black/30 p-4 rounded-2xl text-2xl font-black outline-none"
+                />
 
-              <div className="flex justify-between items-center">
+                <div className="flex justify-between mt-5">
 
-                <span className="text-gray-400">
-                  TOTAL
-                </span>
+                  <span className="text-gray-400">
+                    Cambio
+                  </span>
 
-                <span className="text-6xl font-black bg-gradient-to-r from-emerald-400 to-cyan-400 bg-clip-text text-transparent">
-                  ${totalTicket}
-                </span>
+                  <span className="text-4xl font-black text-emerald-400">
+                    $
+                    {cambio > 0
+                      ? cambio
+                      : 0}
+                  </span>
+
+                </div>
+
+              </div>
+
+              {/* BOTONES */}
+
+              <div className="grid grid-cols-2 gap-3 mt-5">
+
+                <button
+                  onClick={() =>
+                    finalizarVenta(
+                      "Efectivo"
+                    )
+                  }
+                  className="bg-emerald-500 p-5 rounded-3xl font-black"
+                >
+                  Efectivo
+                </button>
+
+                <button
+                  onClick={() =>
+                    finalizarVenta(
+                      "Transferencia"
+                    )
+                  }
+                  className="bg-fuchsia-600 p-5 rounded-3xl font-black"
+                >
+                  Transferencia
+                </button>
+
+                <button
+                  onClick={() =>
+                    finalizarVenta(
+                      "QR"
+                    )
+                  }
+                  className="bg-cyan-500 p-5 rounded-3xl font-black"
+                >
+                  QR
+                </button>
+
+                <button
+                  onClick={() =>
+                    window.print()
+                  }
+                  className="bg-pink-500 p-5 rounded-3xl font-black"
+                >
+                  Imprimir
+                </button>
+
+              </div>
+
+              {/* QR */}
+
+              <div className="bg-white rounded-3xl p-5 mt-5">
+
+                <img
+                  src={qr}
+                  alt="QR"
+                  className="w-full rounded-2xl"
+                />
+
+              </div>
+
+              {/* WHATSAPP */}
+
+              <div className="mt-5">
+
+                <input
+                  placeholder="WhatsApp cliente"
+                  value={
+                    telefonoCliente
+                  }
+                  onChange={(e) =>
+                    setTelefonoCliente(
+                      e.target.value
+                    )
+                  }
+                  className="w-full bg-[#111827] p-4 rounded-2xl outline-none"
+                />
+
+                <button
+                  onClick={
+                    enviarWhatsApp
+                  }
+                  className="w-full bg-green-500 p-5 rounded-3xl mt-3 font-black"
+                >
+                  Enviar WhatsApp
+                </button>
 
               </div>
 
@@ -791,9 +878,9 @@ Gracias ❤️`;
 
           </div>
 
-        </div>
+        )}
 
-      )}
+      </div>
 
     </div>
   );
