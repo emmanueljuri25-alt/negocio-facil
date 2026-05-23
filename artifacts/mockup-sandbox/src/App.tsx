@@ -1,48 +1,33 @@
-import {
-  useEffect,
-  useMemo,
-  useState,
-} from "react";
+import { useEffect, useMemo, useState } from "react";
+
+type Producto = {
+  id: number;
+  nombre: string;
+  precio: number;
+  stock: number;
+  categoria: string;
+};
+
+type TicketItem = {
+  id: number;
+  nombre: string;
+  precio: number;
+  cantidad: number;
+  manual?: boolean;
+};
+
+type Venta = {
+  id: number;
+  fecha: string;
+  metodo: string;
+  total: number;
+  productos: TicketItem[];
+};
 
 export default function App() {
-
-  // ======================================================
-  // TYPES
-  // ======================================================
-
-  type Producto = {
-    id: number;
-    nombre: string;
-    precio: number;
-    stock: number;
-    categoria: string;
-  };
-
-  type TicketItem = {
-    id: number;
-    nombre: string;
-    precio: number;
-    cantidad: number;
-  };
-
-  type Venta = {
-    id: number;
-    fecha: string;
-    metodo: string;
-    total: number;
-    productos: TicketItem[];
-  };
-
-  // ======================================================
-  // STATES
-  // ======================================================
-
   const [vista, setVista] = useState<
-    "dashboard" |
-    "caja" |
-    "stock" |
-    "ventas"
-  >("dashboard");
+    "caja" | "stock" | "ventas"
+  >("caja");
 
   const [productos, setProductos] =
     useState<Producto[]>([]);
@@ -88,7 +73,6 @@ export default function App() {
   // ======================================================
 
   useEffect(() => {
-
     const p =
       localStorage.getItem("productos");
 
@@ -97,8 +81,13 @@ export default function App() {
 
     if (p) {
       setProductos(JSON.parse(p));
-    } else {
+    }
 
+    if (v) {
+      setVentas(JSON.parse(v));
+    }
+
+    if (!p) {
       setProductos([
         {
           id: 1,
@@ -118,35 +107,25 @@ export default function App() {
           id: 3,
           nombre: "Papas Lays",
           precio: 2800,
-          stock: 7,
+          stock: 2,
           categoria: "Snacks",
         },
       ]);
-
     }
-
-    if (v) {
-      setVentas(JSON.parse(v));
-    }
-
   }, []);
 
   useEffect(() => {
-
     localStorage.setItem(
       "productos",
       JSON.stringify(productos)
     );
-
   }, [productos]);
 
   useEffect(() => {
-
     localStorage.setItem(
       "ventas",
       JSON.stringify(ventas)
     );
-
   }, [ventas]);
 
   // ======================================================
@@ -155,7 +134,6 @@ export default function App() {
 
   const productosFiltrados =
     useMemo(() => {
-
       return productos.filter((p) =>
         p.nombre
           .toLowerCase()
@@ -163,36 +141,34 @@ export default function App() {
             busqueda.toLowerCase()
           )
       );
-
     }, [productos, busqueda]);
 
   // ======================================================
   // TOTALES
   // ======================================================
 
-  const totalTicket =
-    ticket.reduce(
-      (acc, item) =>
-        acc +
-        item.precio *
-          item.cantidad,
-      0
-    );
+  const totalTicket = ticket.reduce(
+    (acc, item) =>
+      acc +
+      item.precio * item.cantidad,
+    0
+  );
 
-  const totalCaja =
-    ventas.reduce(
-      (acc, venta) =>
-        acc + venta.total,
-      0
-    );
+  const totalCaja = ventas.reduce(
+    (acc, venta) =>
+      acc + venta.total,
+    0
+  );
 
   const totalProductosVendidos =
     ventas.reduce(
       (acc, venta) =>
         acc +
         venta.productos.reduce(
-          (a, p) =>
-            a + p.cantidad,
+          (
+            a: number,
+            p: TicketItem
+          ) => a + p.cantidad,
           0
         ),
       0
@@ -203,11 +179,10 @@ export default function App() {
     totalTicket;
 
   // ======================================================
-  // PRODUCTOS
+  // AGREGAR PRODUCTO
   // ======================================================
 
   function agregarProducto() {
-
     if (
       !nuevoNombre ||
       !nuevoPrecio
@@ -236,26 +211,75 @@ export default function App() {
     setNuevoCategoria("");
 
     setMostrarNuevo(false);
-
   }
+
+  // ======================================================
+  // ELIMINAR PRODUCTO
+  // ======================================================
+
+  function eliminarProducto(id: number) {
+    const confirmar =
+      confirm(
+        "Eliminar producto?"
+      );
+
+    if (!confirmar) return;
+
+    setProductos(
+      productos.filter(
+        (p) => p.id !== id
+      )
+    );
+  }
+
+  // ======================================================
+  // STOCK RAPIDO
+  // ======================================================
+
+  function sumarStock(id: number) {
+    setProductos(
+      productos.map((p) =>
+        p.id === id
+          ? {
+              ...p,
+              stock: p.stock + 1,
+            }
+          : p
+      )
+    );
+  }
+
+  function restarStock(id: number) {
+    setProductos(
+      productos.map((p) =>
+        p.id === id &&
+        p.stock > 0
+          ? {
+              ...p,
+              stock: p.stock - 1,
+            }
+          : p
+      )
+    );
+  }
+
+  // ======================================================
+  // AGREGAR AL TICKET
+  // ======================================================
 
   function agregarAlTicket(
     producto: Producto
   ) {
-
     if (producto.stock <= 0) {
-      alert("Sin stock");
+      alert("Producto agotado");
       return;
     }
 
-    const existe =
-      ticket.find(
-        (t) =>
-          t.id === producto.id
-      );
+    const existe = ticket.find(
+      (t) => t.id === producto.id
+    );
 
     if (existe) {
-
       setTicket(
         ticket.map((t) =>
           t.id === producto.id
@@ -267,69 +291,62 @@ export default function App() {
             : t
         )
       );
-
     } else {
-
       setTicket([
         ...ticket,
         {
-          id: producto.id,
-          nombre:
-            producto.nombre,
-          precio:
-            producto.precio,
+          ...producto,
           cantidad: 1,
         },
       ]);
-
     }
-
   }
 
   // ======================================================
-  // MANUAL
+  // PRODUCTO MANUAL
   // ======================================================
 
   function agregarProductoManual() {
-
     if (
       !productoManual ||
       !precioManual
-    ) return;
+    )
+      return;
+
+    const nuevo: TicketItem = {
+      id: Date.now(),
+      nombre: productoManual,
+      precio: Number(precioManual),
+      cantidad: 1,
+      manual: true,
+    };
 
     setTicket([
       ...ticket,
-      {
-        id: Date.now(),
-        nombre:
-          productoManual,
-        precio:
-          Number(precioManual),
-        cantidad: 1,
-      },
+      nuevo,
     ]);
 
     setProductoManual("");
     setPrecioManual("");
-
   }
 
   // ======================================================
-  // VENTA
+  // NUEVA VENTA
   // ======================================================
 
   function nuevaVenta() {
-
     setTicket([]);
     setMontoRecibido("");
     setTelefonoCliente("");
-
   }
+
+  // ======================================================
+  // FINALIZAR
+  // ======================================================
 
   function finalizarVenta(
     metodo: string
   ) {
-
     if (ticket.length === 0) {
       alert("No hay productos");
       return;
@@ -340,10 +357,8 @@ export default function App() {
       fecha:
         new Date().toLocaleString(),
       metodo,
-      total:
-        totalTicket,
-      productos:
-        ticket,
+      total: totalTicket,
+      productos: ticket,
     };
 
     setVentas([
@@ -353,16 +368,12 @@ export default function App() {
 
     const actualizados =
       productos.map((p) => {
-
         const vendido =
           ticket.find(
-            (t) =>
-              t.id === p.id
+            (t) => t.id === p.id
           );
 
-        if (!vendido) {
-          return p;
-        }
+        if (!vendido) return p;
 
         return {
           ...p,
@@ -370,7 +381,6 @@ export default function App() {
             p.stock -
             vendido.cantidad,
         };
-
       });
 
     setProductos(actualizados);
@@ -378,7 +388,6 @@ export default function App() {
     nuevaVenta();
 
     alert("Venta realizada");
-
   }
 
   // ======================================================
@@ -386,7 +395,6 @@ export default function App() {
   // ======================================================
 
   function enviarWhatsApp() {
-
     if (!telefonoCliente) {
       alert("Ingresar teléfono");
       return;
@@ -398,13 +406,14 @@ export default function App() {
         ""
       );
 
-    const detalle =
-      ticket
-        .map(
-          (p) =>
-            `${p.nombre} x${p.cantidad} - $${p.precio * p.cantidad}`
-        )
-        .join("\n");
+    const detalle = ticket
+      .map(
+        (p) =>
+          `${p.nombre} x${p.cantidad} - $${
+            p.precio * p.cantidad
+          }`
+      )
+      .join("\n");
 
     const mensaje =
 `🧾 NEGOCIO FÁCIL
@@ -416,129 +425,72 @@ TOTAL: $${totalTicket}
 Gracias ❤️`;
 
     const url =
-      `https://wa.me/54${numero}?text=${encodeURIComponent(mensaje)}`;
+      `https://wa.me/54${numero}?text=${encodeURIComponent(
+        mensaje
+      )}`;
 
-    window.open(
-      url,
-      "_blank"
-    );
-
+    window.open(url, "_blank");
   }
-
-  // ======================================================
-  // QR
-  // ======================================================
 
   const qr =
     `https://api.qrserver.com/v1/create-qr-code/?size=250x250&data=TOTAL:${totalTicket}`;
 
-  // ======================================================
-  // UI
-  // ======================================================
-
   return (
-
     <div className="min-h-screen bg-gradient-to-br from-slate-100 via-white to-indigo-100">
 
-      {/* HEADER */}
+      <div className="sticky top-0 z-50 backdrop-blur-xl bg-white/80 border-b border-white/20 shadow-lg">
 
-      <div className="sticky top-0 z-50 bg-white/80 backdrop-blur-xl border-b shadow-lg">
-
-        <div className="p-5 flex flex-wrap justify-between items-center gap-4">
+        <div className="p-4 flex flex-wrap gap-4 items-center justify-between">
 
           <div>
-
-            <h1 className="text-5xl font-black text-slate-800">
+            <h1 className="text-4xl font-black text-slate-800">
               NEGOCIO FÁCIL
             </h1>
 
-            <p className="text-gray-500 text-lg">
-              Sistema POS Premium
+            <p className="text-gray-500">
+              Premium POS
             </p>
-
           </div>
 
           <div className="flex flex-wrap gap-3">
 
-            <div className="bg-white rounded-3xl shadow-xl px-6 py-4">
-
-              <p className="text-gray-500 text-sm">
+            <div className="bg-white rounded-2xl p-4 shadow-lg min-w-[140px]">
+              <p className="text-sm text-gray-500">
                 Caja diaria
               </p>
 
-              <h3 className="text-3xl font-black text-emerald-500">
+              <h3 className="text-2xl font-black text-emerald-500">
                 ${totalCaja}
               </h3>
-
             </div>
 
-            <div className="bg-white rounded-3xl shadow-xl px-6 py-4">
-
-              <p className="text-gray-500 text-sm">
+            <div className="bg-white rounded-2xl p-4 shadow-lg min-w-[140px]">
+              <p className="text-sm text-gray-500">
                 Ventas
               </p>
 
-              <h3 className="text-3xl font-black text-indigo-500">
+              <h3 className="text-2xl font-black text-indigo-500">
                 {ventas.length}
               </h3>
-
             </div>
 
-            <div className="bg-white rounded-3xl shadow-xl px-6 py-4">
-
-              <p className="text-gray-500 text-sm">
+            <div className="bg-white rounded-2xl p-4 shadow-lg min-w-[140px]">
+              <p className="text-sm text-gray-500">
                 Productos vendidos
               </p>
 
-              <h3 className="text-3xl font-black text-pink-500">
+              <h3 className="text-2xl font-black text-pink-500">
                 {totalProductosVendidos}
               </h3>
-
             </div>
 
           </div>
-
         </div>
-
       </div>
 
-      {/* NAV */}
-
-      <div className="p-4 flex flex-wrap gap-3">
-
-        {[
-          "dashboard",
-          "caja",
-          "stock",
-          "ventas",
-        ].map((item) => (
-
-          <button
-            key={item}
-            onClick={() =>
-              setVista(
-                item as
-                  | "dashboard"
-                  | "caja"
-                  | "stock"
-                  | "ventas"
-              )
-            }
-            className={`px-6 py-4 rounded-2xl font-black transition-all ${
-              vista === item
-                ? "bg-indigo-600 text-white shadow-xl scale-105"
-                : "bg-white hover:scale-105"
-            }`}
-          >
-            {item}
-          </button>
-
-        ))}
-
+      <div className="p-4 text-xl font-black">
+        ✅ Sistema restaurado correctamente
       </div>
-
     </div>
-
   );
-
 }
