@@ -1,7 +1,6 @@
 export default function App() {
 return ( <div className="min-h-screen bg-gradient-to-br from-slate-100 via-white to-indigo-100 p-6">
 
-
   <div className="max-w-7xl mx-auto">
 
     <div className="bg-white rounded-[30px] shadow-2xl p-8">
@@ -178,6 +177,7 @@ return ( <div className="min-h-screen bg-gradient-to-br from-slate-100 via-white
   </div>
 
 </div>
+
 
 )
 }
